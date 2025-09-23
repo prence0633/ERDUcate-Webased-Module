@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ERDucate - Homepage</title>
+<link rel="icon" href="ERDucate.ico">
+<style>
+  * * {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  background: #f9f9f9;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+header {
+  background-color: #800000;
+  color: #fff;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+header .title {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+header .nav-buttons button {
+  background: transparent;
+  border: 2px solid #fff;
+  color: #fff;
+  padding: 10px 16px; /* bigger tap area */
+  margin-left: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s ease;
+  font-size: 16px;
+}
+
+header .nav-buttons button:hover {
+  background: #fff;
+  color: #800000;
+}
+
+.welcome {
+  font-size: 16px;
+  padding: 10px 20px;
+  background: #ffe8e8;
+  color: #800000;
+}
+
+.cursor {
+  display: inline-block;
+  width: 8px;
+  background: #800000;
+  margin-left: 2px;
+  animation: blink 0.8s infinite;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.container {
+  max-width: 1000px;
+  margin: 30px auto;
+  padding: 0 20px;
+  text-align: center;
+  flex-grow: 1;
+}
+
+.search-bar {
+  margin-bottom: 30px;
+}
+
+.search-bar input {
+  width: 60%;
+  padding: 10px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+.topic {
+  background: #fff;
+  padding: 25px 20px;
+  border-radius: 12px;
+  width: 220px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  transition: 0.3s ease;
+  text-decoration: none;
+  color: #333;
+}
+
+.topic:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+}
+
+.topic h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #800000;
+}
+
+.no-results {
+  margin-top: 20px;
+  font-size: 14px;
+  color: #999;
+}
+
+footer {
+  text-align: center;
+  background: #800000;
+  color: #fff;
+  padding: 15px;
+  font-size: 13px;
+}
+
+/* --- Responsive adjustments --- */
+@media (max-width: 1024px) {
+  #gameWrapper { gap: 20px; }
+  .box { min-width: 100px; min-height: 120px; padding: 16px; }
+  .item { padding: 8px 12px; font-size: 0.9rem; }
+  h1 { font-size: 1.25rem; }
+  .cta-btn { font-size: 1rem; padding: 10px 18px; }
+}
+
+@media (max-width: 768px) {
+  #gameWrapper { flex-direction: column; gap: 20px; }
+  .column { gap: 10px; }
+  .box { min-width: 90px; min-height: 110px; padding: 12px; font-size: 0.85rem; flex: 1; }
+  .item { padding: 6px 10px; font-size: 0.85rem; }
+  h1 { font-size: 1.125rem; }
+  .cta-btn { font-size: 0.95rem; padding: 8px 16px; width: 100%; }
+}
+
+@media (max-width: 480px) {
+  .box { min-width: 70px; min-height: 90px; padding: 10px; font-size: 0.8rem; }
+  .item { padding: 5px 8px; font-size: 0.8rem; }
+  h1 { font-size: 1rem; }
+  .cta-btn { font-size: 0.9rem; padding: 6px 12px; width: 100%; max-width: 280px; margin: 0 auto; }
+}
+
+/* --- Popup Modal --- */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6);
+  justify-content: center;
+  align-items: center;
+  padding: 10px; /* padding for smaller screens */
+}
+
+.modal-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh; /* avoid overflowing on small screens */
+  overflow-y: auto;
+  text-align: center;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+  animation: fadeIn 0.4s ease;
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  color: #800000;
+}
+
+.modal-content p {
+  margin: 12px 0;
+  font-size: 15px;
+  text-align: justify;
+}
+
+.modal-content ul {
+  text-align: left;
+  margin: 10px 0 0 20px;
+  padding: 0;
+}
+
+.modal-content li {
+  margin-bottom: 6px;
+}
+
+.modal-content button {
+  margin-top: 20px;
+  padding: 14px;
+  background: #800000;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: 0.3s ease;
+  width: 100%; /* full-width for mobile tap */
+}
+
+.modal-content button:hover {
+  background: #a83232;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* --- Centered Lesson 9 --- */
+.topic.lesson9 {
+  order: 99;
+  align-self: center;
+}
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="title">ERDucate Web-based Module</div>
+  <div class="nav-buttons">
+    <button onclick="goToAbout()">👤 About</button>
+    <button onclick="goToFeedback()">💬 Feedback</button>
+    <button onclick="logout()">🚪 Logout</button>
+  </div>
+</header>
+
+<div class="welcome">
+  Hello, <span id="user-name"></span> from <span id="user-course"></span><span class="cursor"></span>!
+</div>
+
+<div class="container">
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="Search Lesson..." onkeyup="filterTopics()" />
+  </div>
+
+  <div class="topics" id="topicsList">
+    <!-- Lesson links -->
+    <a href="Lesson1.html" class="topic" data-title="introduction to databases & importance of structuring">
+      <h3>📚 Lesson 1: Introduction to Databases & Importance of Structuring</h3>
+    </a>
+    <a href="Lesson2.html" class="topic" data-title="basic concepts of database structure">
+      <h3>📚 Lesson 2: Basic Concepts of Database Structure</h3>
+    </a>
+    <a href="Lesson3.html" class="topic" data-title="identifying entities & attributes">
+      <h3>📚 Lesson 3: Identifying Entities & Attributes</h3>
+    </a>
+    <a href="Lesson4.html" class="topic" data-title="table structures & keys">
+      <h3>📚 Lesson 4: Table Structures & Keys</h3>
+    </a>
+    <a href="Lesson5.html" class="topic" data-title="table relationships">
+      <h3>📚 Lesson 5: Table Relationships</h3>
+    </a>
+    <a href="Lesson6.html" class="topic" data-title="data types & designing the erd">
+      <h3>📚 Lesson 6: Data Types & Designing the ERD</h3>
+    </a>
+    <a href="Lesson7.html" class="topic" data-title="normalization & database design">
+      <h3>📚 Lesson 7: Normalization & Database Design</h3>
+    </a>
+    <a href="Lesson8.html" class="topic" data-title="introduction to sql & querying databases">
+      <h3>📚 Lesson 8: Introduction to SQL & Querying Databases</h3>
+    </a>
+    <!-- NEW LESSON 9: centered -->
+    <a href="practiceERD.html" class="topic lesson9" data-title="practice designing erd">
+      <h3>🎯 Lesson 9: Practice Designing ERD</h3>
+    </a>
+  </div>
+  <div id="noResults" class="no-results" style="display:none;">No topics found.</div>
+</div>
+
+<footer>
+  <p>ERDucate Developer © 2025 | Technological University of the Philippines</p>
+</footer>
+
+<!-- Popup Modal -->
+<div class="modal" id="introModal">
+  <div class="modal-content">
+    <h2>Welcome to ERDucate!</h2>
+    <p><b>About this Module:</b> ERDucate is designed to make learning <b>Entity-Relationship Diagrams (ERD)</b> and database concepts simple, interactive, and fun. You will learn step by step through lessons, quizzes, and games.</p>
+    <p><b>How to Use:</b></p>
+    <ul>
+      <li>✅ Start with each <b>Lesson</b> to learn new concepts.</li>
+      <li>📝 Take the <b>Quiz</b> after every lesson to test yourself.</li>
+      <li>🎮 Play the <b>Game</b> to practice in an engaging way.</li>
+      <li>🏆 Earn a <b>Certificate</b> after completing each lesson + quiz + game.</li>
+      <li>📚 Finish all lessons to collect all certificates and complete the module.</li>
+      <li>We’d love your feedback! 💬 Kindly answer our acceptability survey using the feedback button.</li>
+    </ul>
+    <p style="margin-top:10px; font-style:italic;">💡 Tip: Your progress is saved automatically, so you can continue anytime.</p>
+    <button onclick="closeModal()">Got it, Let’s Start!</button>
+  </div>
+</div>
+
+<script>
+  const users = JSON.parse(localStorage.getItem('users')) || {};
+  const currentUser = localStorage.getItem('loggedInUser');
+
+  if (!currentUser || !users[currentUser]) {
+    window.location.href = 'login.html';
+  } else {
+    const course = users[currentUser].course;
+    typeText("user-name", currentUser, 80, () => {
+      typeText("user-course", course, 80);
+    });
+  }
+
+  function typeText(elementId, text, speed = 100, callback = null) {
+    let i = 0;
+    const element = document.getElementById(elementId);
+    element.textContent = "";
+    function typing() {
+      if (i < text.length) {
+        element.textContent += text.charAt(i);
+        i++;
+        setTimeout(typing, speed);
+      } else if (callback) {
+        callback();
+      }
+    }
+    typing();
+  }
+
+  function logout() {
+    localStorage.removeItem('loggedInUser');
+    window.location.href = 'login.html';
+  }
+
+  function goToAbout() {
+    window.location.href = 'about.html';
+  }
+
+  function goToFeedback() {
+    window.location.href = 'feedback.html';
+  }
+
+  function filterTopics() {
+    const input = document.getElementById('searchInput').value.toLowerCase();
+    const topics = document.querySelectorAll('.topic');
+    let found = false;
+
+    topics.forEach(topic => {
+      const title = topic.getAttribute('data-title');
+      if (title.includes(input)) {
+        topic.style.display = 'block';
+        found = true;
+      } else {
+        topic.style.display = 'none';
+      }
+    });
+
+    document.getElementById('noResults').style.display = found ? 'none' : 'block';
+  }
+
+  // Show modal on page load
+  window.onload = () => {
+    document.getElementById('introModal').style.display = 'flex';
+  }
+
+  function closeModal() {
+    document.getElementById('introModal').style.display = 'none';
+  }
+</script>
+
+</body>
+</html>

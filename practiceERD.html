@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ERDucate ERD Builder</title> 
+<link rel="icon" href="ERDucate.ico">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: #f8fafc;
+    color: #1e293b;
+  }
+  header {
+    background: linear-gradient(135deg, #800000, #a83232);
+    color: #fff;
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  header .title { font-size: 1.3rem; font-weight: bold; }
+  header .nav-buttons button {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  header .nav-buttons button:hover {
+    background: #fff;
+    color: #800000;
+  }
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 12px;
+    background: #e2e8f0;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  }
+  .toolbar button {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    background: #800000;
+    color: #fff;
+    font-size: 0.9rem;
+    transition: 0.25s;
+  }
+  .toolbar button:hover {
+    background: #a83232;
+  }
+  #canvas {
+    flex: 1;
+    position: relative;
+    background-image: linear-gradient(#ddd 1px, transparent 1px), 
+                      linear-gradient(90deg, #ddd 1px, transparent 1px);
+    background-size: 20px 20px;
+    overflow: hidden;
+  }
+  .entity {
+    position: absolute;
+    background: #fff;
+    border: 2px solid #800000;
+    border-radius: 6px;
+    padding: 8px;
+    min-width: 100px;
+    cursor: move;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  }
+  .entity .title {
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 6px;
+    cursor: pointer;
+  }
+  .entity .attributes {
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
+  .relationship {
+    position: absolute;
+    pointer-events: none;
+  }
+  .relationship text {
+    font-size: 12px;
+    fill: #000;
+    cursor: pointer;
+    pointer-events: auto;
+  }
+  .pk { font-weight: bold; color: #800000; }
+  .fk { font-style: italic; color: #1e40af; }
+  /* MODAL STYLING */
+  .modal {
+    display: none; 
+    position: fixed; 
+    z-index: 999; 
+    left: 0; top: 0; 
+    width: 100%; height: 100%; 
+    background: rgba(0,0,0,0.6); 
+    justify-content: center; 
+    align-items: center;
+  }
+  .modal-content {
+    background: #fff;
+    color: #1e293b;
+    padding: 20px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    text-align: center;
+    animation: fadeIn 0.4s ease;
+    position: relative;
+  }
+  .modal-content h2 { color: #800000; margin-bottom: 10px; }
+  .modal-content p { font-size: 0.95rem; line-height: 1.5; }
+  .modal .close {
+    position: absolute;
+    top: 12px; right: 20px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #800000;
+    cursor: pointer;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+/* ---------------------- */
+/* RESPONSIVENESS SECTION */
+/* ---------------------- */
+@media (max-width: 1024px) {
+  header .title { font-size: 1.2rem; }
+  .toolbar { gap: 8px; padding: 10px; }
+  .toolbar button { font-size: 0.85rem; padding: 7px 12px; }
+  .entity { min-width: 90px; padding: 6px; }
+}
+
+@media (max-width: 768px) {
+  header { flex-direction: column; align-items: flex-start; }
+  header .title { font-size: 1.1rem; margin-bottom: 8px; }
+  .toolbar { justify-content: center; }
+  .modal-content { width: 95%; }
+  .entity { min-width: 80px; font-size: 0.85rem; }
+}
+
+@media (max-width: 480px) {
+  header { padding: 10px; }
+  header .title { font-size: 1rem; }
+  header .nav-buttons button { padding: 5px 10px; font-size: 0.8rem; }
+  .toolbar { flex-direction: column; gap: 6px; padding: 8px; }
+  .toolbar button { width: 100%; font-size: 0.8rem; }
+  .modal-content { padding: 15px; }
+  .modal-content h2 { font-size: 1.1rem; }
+  .modal-content p { font-size: 0.9rem; }
+  .entity { min-width: 70px; padding: 5px; font-size: 0.8rem; }
+  .entity .title { font-size: 0.85rem; }
+  .entity .attributes { font-size: 0.75rem; }
+  .relationship text { font-size: 10px; }
+}
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="title">ERDucate ERD Builder</div>
+  <div class="nav-buttons">
+    <button onclick="goHome()">🏠 Home</button>
+    <button onclick="logout()">🚪 Logout</button>
+  </div>
+</header>
+
+<!-- INTRO MODAL -->
+<div id="introModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeIntro()">&times;</span>
+    <h2>Welcome to ERDucate ERD Builder 🎓</h2>
+    <p>
+      This tool allows you to create, edit, and validate Entity-Relationship Diagrams (ERDs) easily.
+      <br><br>
+      ✅ Add entities, attributes, and relationships <br>
+      ✅ Drag and drop entities on the grid <br>
+      ✅ Edit names, attributes, and cardinalities <br>
+      ✅ Validate your ERD before submission
+    </p>
+    <button onclick="closeIntro()" style="margin-top:15px; padding:8px 16px; background:#800000; color:#fff; border:none; border-radius:6px; cursor:pointer;">Get Started</button>
+  </div>
+</div>
+
+<div class="toolbar">
+  <button onclick="addEntity()">Add Entity</button>
+  <button onclick="addRelationship()">Add Relationship</button>
+  <button onclick="addAttribute()">Add Attribute</button>
+  <button onclick="addPK()">Add PK</button>
+  <button onclick="addFK()">Add FK</button>
+  <button onclick="deleteSelected()">Delete</button>
+  <button onclick="validateERD()">Validate ERD</button>
+  <button onclick="undo()">Undo</button>
+  <button onclick="redo()">Redo</button>
+</div>
+
+<div id="canvas"></div>
+<svg id="svgLayer" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;"></svg>
+
+<script>
+  
+  let canvas = document.getElementById('canvas');
+  let svgLayer = document.getElementById('svgLayer');
+  let entities = [];
+  let relationships = [];
+  let selectedEntity = null;
+  let selectedRelationship = null;
+  let selectedAttribute = null;
+
+  // --- HISTORY SYSTEM ---
+  let undoStack = [];
+  let redoStack = [];
+
+  function saveState() {
+    let snapshot = {
+      entities: canvas.innerHTML,
+      relationships: svgLayer.innerHTML
+    };
+    undoStack.push(JSON.stringify(snapshot));
+    redoStack = [];
+  }
+
+  function loadState(snapshot) {
+    let state = JSON.parse(snapshot);
+    canvas.innerHTML = state.entities;
+    svgLayer.innerHTML = state.relationships;
+
+    // rebuild arrays
+    entities = Array.from(canvas.querySelectorAll(".entity"));
+    relationships = [];
+
+    // rebind entity events
+    entities.forEach(ent => {
+      ent.onmousedown = startDrag;
+      ent.onclick = () => { selectedEntity = ent; selectedRelationship = null; };
+      let title = ent.querySelector(".title");
+      title.ondblclick = () => {
+        let newName = prompt("Rename entity:", title.innerText);
+        if (newName) { title.innerText = newName; saveState(); }
+      };
+      Array.from(ent.querySelectorAll(".attributes div")).forEach(div => {
+        div.onclick = () => { selectedAttribute = div; };
+        div.ondblclick = () => {
+          let newAttr = prompt("Edit attribute:", div.innerText.replace(/🔑|🔗/g,""));
+          if (newAttr) { div.innerText = newAttr; saveState(); }
+        };
+      });
+    });
+
+    // rebind relationships (lines + texts)
+    let lines = svgLayer.querySelectorAll("line");
+    let texts = svgLayer.querySelectorAll("text");
+    lines.forEach((line, i) => {
+      let text = texts[i];
+      text.addEventListener("dblclick", () => {
+        let newCard = prompt("Edit cardinality:", text.textContent);
+        if (newCard) { text.textContent = newCard; saveState(); }
+      });
+      relationships.push({ ent1: null, ent2: null, line, text });
+    });
+  }
+
+  function undo() {
+    if (undoStack.length > 1) {
+      let snapshot = undoStack.pop();
+      redoStack.push(snapshot);
+      loadState(undoStack[undoStack.length - 1]);
+    }
+  }
+
+  function redo() {
+    if (redoStack.length > 0) {
+      let snapshot = redoStack.pop();
+      undoStack.push(snapshot);
+      loadState(snapshot);
+    }
+  }
+
+  // --- ADD ENTITY ---
+  function addEntity() {
+    let name = prompt("Enter entity name:");
+    if (!name) return;
+    let entity = document.createElement("div");
+    entity.className = "entity";
+    entity.style.left = "100px";
+    entity.style.top = "100px";
+
+    let title = document.createElement("div");
+    title.className = "title";
+    title.innerText = name;
+    title.ondblclick = () => {
+      let newName = prompt("Rename entity:", title.innerText);
+      if (newName) { title.innerText = newName; saveState(); }
+    };
+
+    let attributes = document.createElement("div");
+    attributes.className = "attributes";
+
+    entity.appendChild(title);
+    entity.appendChild(attributes);
+
+    entity.onmousedown = startDrag;
+    entity.onclick = () => { selectedEntity = entity; selectedRelationship = null; };
+
+    canvas.appendChild(entity);
+    entities.push(entity);
+    saveState();
+  }
+
+  // --- ADD RELATIONSHIP ---
+  function addRelationship() {
+    if (entities.length < 2) {
+      alert("At least 2 entities are required.");
+      return;
+    }
+    let e1 = prompt("Enter first entity name:");
+    let e2 = prompt("Enter second entity name:");
+    let card = prompt("Enter cardinality (1:1, 1:N, M:N):", "1:N");
+    let ent1 = entities.find(e => e.querySelector(".title").innerText === e1);
+    let ent2 = entities.find(e => e.querySelector(".title").innerText === e2);
+    if (!ent1 || !ent2) {
+      alert("Entities not found.");
+      return;
+    }
+    let line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    line.setAttribute("stroke", "#000");
+    line.setAttribute("stroke-width", "2");
+
+    let text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    text.textContent = card;
+    text.addEventListener("dblclick", () => {
+      let newCard = prompt("Edit cardinality:", text.textContent);
+      if (newCard) { text.textContent = newCard; saveState(); }
+    });
+
+    svgLayer.appendChild(line);
+    svgLayer.appendChild(text);
+
+    relationships.push({ ent1, ent2, line, text });
+    updateLines();
+    saveState();
+  }
+
+  // --- ADD ATTRIBUTE ---
+  function addAttribute() {
+    if (!selectedEntity) {
+      alert("Select an entity first.");
+      return;
+    }
+    let attr = prompt("Enter attribute name:");
+    if (!attr) return;
+    let div = document.createElement("div");
+    div.innerText = attr;
+    div.onclick = () => { selectedAttribute = div; };
+    div.ondblclick = () => {
+      let newAttr = prompt("Edit attribute:", div.innerText.replace(/🔑|🔗/g,""));
+      if (newAttr) { div.innerText = newAttr; saveState(); }
+    };
+    selectedEntity.querySelector(".attributes").appendChild(div);
+    saveState();
+  }
+
+  // --- ADD PRIMARY KEY ---
+  function addPK() {
+    if (!selectedAttribute) {
+      alert("Select an attribute first.");
+      return;
+    }
+    selectedAttribute.classList.add("pk");
+    selectedAttribute.innerText = "🔑 " + selectedAttribute.innerText.replace(/🔑|🔗/g,"");
+    saveState();
+  }
+
+  // --- ADD FOREIGN KEY ---
+  function addFK() {
+    if (!selectedAttribute) {
+      alert("Select an attribute first.");
+      return;
+    }
+    selectedAttribute.classList.add("fk");
+    selectedAttribute.innerText = "🔗 " + selectedAttribute.innerText.replace(/🔑|🔗/g,"");
+    saveState();
+  }
+
+  // --- DELETE ---
+  function deleteSelected() {
+    if (selectedEntity) {
+      relationships = relationships.filter(r => {
+        if (r.ent1 === selectedEntity || r.ent2 === selectedEntity) {
+          r.line.remove(); r.text.remove();
+          return false;
+        }
+        return true;
+      });
+      entities = entities.filter(e => e !== selectedEntity);
+      selectedEntity.remove();
+      selectedEntity = null;
+      saveState();
+    } else if (selectedRelationship) {
+      selectedRelationship.line.remove();
+      selectedRelationship.text.remove();
+      relationships = relationships.filter(r => r !== selectedRelationship);
+      selectedRelationship = null;
+      saveState();
+    } else if (selectedAttribute) {
+      selectedAttribute.remove();
+      selectedAttribute = null;
+      saveState();
+    } else {
+      alert("Nothing selected.");
+    }
+  }
+
+  // --- DRAG ---
+  let offsetX, offsetY, draggedEntity;
+  function startDrag(e) {
+    draggedEntity = e.currentTarget;
+    offsetX = e.clientX - draggedEntity.offsetLeft;
+    offsetY = e.clientY - draggedEntity.offsetTop;
+    document.onmousemove = dragEntity;
+    document.onmouseup = stopDrag;
+  }
+  function dragEntity(e) {
+    draggedEntity.style.left = (e.clientX - offsetX) + "px";
+    draggedEntity.style.top = (e.clientY - offsetY) + "px";
+    updateLines();
+  }
+  function stopDrag() {
+    document.onmousemove = null;
+    document.onmouseup = null;
+    saveState();
+  }
+
+  // --- UPDATE LINES ---
+  function updateLines() {
+    relationships.forEach(r => {
+      if (!r.ent1 || !r.ent2) return;
+      let rect1 = r.ent1.getBoundingClientRect();
+      let rect2 = r.ent2.getBoundingClientRect();
+      let c1 = { x: rect1.left + rect1.width/2, y: rect1.top + rect1.height/2 };
+      let c2 = { x: rect2.left + rect2.width/2, y: rect2.top + rect2.height/2 };
+      r.line.setAttribute("x1", c1.x);
+      r.line.setAttribute("y1", c1.y);
+      r.line.setAttribute("x2", c2.x);
+      r.line.setAttribute("y2", c2.y);
+      r.text.setAttribute("x", (c1.x + c2.x)/2);
+      r.text.setAttribute("y", (c1.y + c2.y)/2);
+    });
+  }
+
+  // --- VALIDATION ---
+  function validateERD() {
+    let errors = [];
+
+    if (relationships.length < 1) errors.push("At least 2 entities must be connected.");
+
+    entities.forEach(ent => {
+      let connected = relationships.some(r => r.ent1 === ent || r.ent2 === ent);
+      if (!connected) errors.push(ent.querySelector(".title").innerText + " is isolated.");
+    });
+
+    entities.forEach(ent => {
+      let attrs = Array.from(ent.querySelector(".attributes").children).map(a => a.innerText.replace(/🔑|🔗/g,""));
+      let dupes = attrs.filter((a, i) => attrs.indexOf(a) !== i);
+      if (dupes.length > 0) errors.push(ent.querySelector(".title").innerText + " has duplicate attributes.");
+    });
+
+    if (errors.length === 0) alert("ERD is valid ✅");
+    else alert("Validation errors:\n- " + errors.join("\n- "));
+  }
+
+  function logout() { localStorage.removeItem("loggedInUser"); window.location.href = "login.html"; }
+  function goHome() { window.location.href = "index.html"; }
+
+  // --- INTRO MODAL ---
+  function closeIntro() {
+    document.getElementById("introModal").style.display = "none";
+  }
+
+  window.onload = function() {
+    document.getElementById("introModal").style.display = "flex";
+    saveState();
+  };
+
+  window.addEventListener("resize", updateLines);
+
+
+</script>
+</body>
+</html>

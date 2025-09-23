@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ERDucate Web Based Module — Lesson 7</title>
+  <link rel="icon" href="ERDucate.ico">
+  <style>
+   :root {
+  --maroon: #800000;
+  --bg: #f9f9f9;
+}
+
+body {
+  margin: 0;
+  font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+  background: var(--bg);
+  color: #222;
+}
+
+.page {
+  max-width: 1000px;
+  margin: 28px auto;
+  padding: 0 16px;
+}
+
+h1 {
+  text-align: center;
+  color: var(--maroon);
+  margin-bottom: 14px;
+}
+
+/* Lesson Scene */
+.lesson-container {
+  position: relative;
+  width: 100%;
+  min-height: 60vh; /* responsive height */
+  max-height: 600px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #eee;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+}
+
+.scene-bg {
+  position: absolute;
+  inset: 0;
+  background: url("Cafeteria-background.jpg") center/cover no-repeat;
+  filter: brightness(0.92) saturate(1.05) contrast(1.1);
+}
+
+/* Characters */
+.characters {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.student {
+  position: absolute;
+  bottom: 5%;
+  width: 10vw;
+  max-width: 120px;
+  z-index: 5;
+  opacity: 0;
+  transform: translateY(5%);
+  transition: transform 0.6s ease, opacity 0.35s ease;
+}
+
+.student1 {
+  left: 35%;
+}
+
+.student2 {
+  left: 55%;
+}
+
+.student3 {
+  left: 75%;
+}
+
+/* Speech bubbles */
+.speech {
+  position: absolute;
+  max-width: 80%;
+  background: #fff;
+  padding: 10px 14px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  font-size: 1rem;
+  line-height: 1.4;
+  opacity: 0;
+  transform: translateY(0);
+  transition: opacity 0.36s ease, transform 0.36s ease;
+  z-index: 9;
+  word-wrap: break-word;
+}
+
+.speech.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Character-specific bubbles */
+.speech.student1-bubble {
+  bottom: 25%;
+  left: 15%;
+  text-align: left;
+}
+
+.speech.student1-bubble::after {
+  left: -0.6em;
+  top: 1.2em;
+  border-width: 0.6em;
+  border-style: solid;
+  border-color: transparent #fff transparent transparent;
+  position: absolute;
+  content: "";
+}
+
+.speech.student2-bubble {
+  bottom: 25%;
+  left: 40%;
+  text-align: left;
+}
+
+.speech.student2-bubble::after {
+  left: -0.6em;
+  top: 1.2em;
+  border-width: 0.6em;
+  border-style: solid;
+  border-color: transparent #fff transparent transparent;
+  position: absolute;
+  content: "";
+}
+
+.speech.student3-bubble {
+  bottom: 25%;
+  left: 65%;
+  text-align: left;
+}
+
+.speech.student3-bubble::after {
+  left: -0.6em;
+  top: 1.2em;
+  border-width: 0.6em;
+  border-style: solid;
+  border-color: transparent #fff transparent transparent;
+  position: absolute;
+  content: "";
+}
+
+/* Controls */
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  align-items: center;
+  margin-top: 14px;
+}
+
+.btn {
+  background: var(--maroon);
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 6px 18px rgba(128, 0, 0, 0.12);
+}
+
+.btn.secondary {
+  background: #fff;
+  color: var(--maroon);
+  border: 2px solid var(--maroon);
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+/* Modal */
+.modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 9999;
+}
+
+.modal-card {
+  width: 92%;
+  max-width: 640px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px 22px;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.25);
+  text-align: left;
+}
+
+.modal-card h2 {
+  margin-top: 0;
+  color: var(--maroon);
+}
+
+.modal-card p {
+  margin: 8px 0;
+  line-height: 1.45;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+/* DB Info */
+#dbInfo {
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 360px;
+  background: #fff;
+  border: 2px solid var(--maroon);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  z-index: 9999;
+}
+
+#dbInfo h3 {
+  margin-top: 0;
+  color: var(--maroon);
+  font-size: 18px;
+}
+
+#dbInfo p {
+  font-size: 14px;
+  line-height: 1.4;
+  margin: 6px 0;
+}
+
+#dbInfo table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 10px 0;
+  font-size: 13px;
+}
+
+#dbInfo th,
+#dbInfo td {
+  border: 1px solid #999;
+  padding: 6px;
+  text-align: center;
+}
+
+.quiz-link-btn {
+  display: block;
+  margin-top: 10px;
+  text-align: center;
+  padding: 10px;
+  background: var(--maroon);
+  color: #fff;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+/* Media Queries */
+@media (max-width: 800px) {
+  .student {
+    width: 100px;
+  }
+  .speech {
+    max-width: 70%;
+    font-size: 0.9rem;
+  }
+  .speech.student1-bubble {
+    bottom: 28%;
+    left: 12%;
+  }
+  .speech.student2-bubble {
+    bottom: 28%;
+    left: 38%;
+  }
+  .speech.student3-bubble {
+    bottom: 28%;
+    left: 62%;
+  }
+  #dbInfo {
+    width: 280px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .lesson-container {
+    min-height: 50vh;
+  }
+  .student {
+    width: 80px;
+  }
+  .speech {
+    font-size: 0.85rem;
+    max-width: 90%;
+  }
+  .speech.student1-bubble {
+    bottom: 30%;
+    left: 5%;
+  }
+  .speech.student2-bubble {
+    bottom: 30%;
+    left: 35%;
+  }
+  .speech.student3-bubble {
+    bottom: 30%;
+    left: 65%;
+  }
+  #dbInfo {
+    width: 240px;
+    font-size: 12px;
+  }
+}
+
+/* ✅ ADDED EXTRA RESPONSIVENESS (DO NOT REMOVE EXISTING CODE) */
+@media (max-width: 1024px) {
+  .page {
+    max-width: 94%;
+  }
+  .lesson-container {
+    max-height: 520px;
+  }
+  .student {
+    width: 9vw;
+  }
+  .speech {
+    font-size: 0.95rem;
+    max-width: 75%;
+  }
+}
+
+@media (max-width: 768px) {
+  .page {
+    max-width: 92%;
+  }
+  h1 {
+    font-size: 1.4rem;
+  }
+  .lesson-container {
+    min-height: 55vh;
+  }
+  .student {
+    width: 85px;
+  }
+  .speech {
+    font-size: 0.9rem;
+  }
+  .controls {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+}
+
+  </style>
+<body>
+  <div class="page">
+    <h1>Lesson 7 — Normalization & Database Design</h1>
+
+    <!-- Lesson Objectives -->
+    <div class="modal-card" style="margin-bottom:18px;">
+      <h2>Lesson 7 Objectives</h2>
+      <p>At the end of the lesson, the student should be able to:</p>
+      <ul>
+        <li>Explain the purpose of Normalization in database design</li>
+        <li>Differentiate 1st, 2nd, and 3rd Normal Forms</li>
+        <li>Create well-structured tables without redundancy</li>
+        <li>Apply Normalization concepts to improve ERD design</li>
+      </ul>
+    </div>
+
+    <!-- Story Scene -->
+    <div class="lesson-container">
+      <div class="scene-bg"></div>
+      <div class="characters">
+        <img src="studentfrankie.jpg" alt="Frankie" class="student student1" id="student1Img">
+        <img src="sTUDENT-jOHN.jpg" alt="John" class="student student2" id="student2Img">
+        <img src="Student-Mia.png" alt="Mia" class="student student3" id="student3Img">
+      </div>
+      <!-- Bubbles -->
+      <div class="speech student1-bubble" id="student1Bubble"></div>
+      <div class="speech student2-bubble" id="student2Bubble"></div>
+      <div class="speech student3-bubble" id="student3Bubble"></div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <button class="btn" id="startBtn">Start Lesson</button>
+      <button class="btn secondary" id="nextBtn" disabled>Next</button>
+      <button class="btn secondary" id="skipBtn">Skip to Quiz</button>
+    </div>
+  </div>
+
+  <!-- Intro Modal -->
+ <div class="modal" id="introModal">
+  <div class="modal-card">
+    <h2>Intro — Lesson Overview</h2>
+    <p>
+      In the Cafeteria, John complains about messy tables: <strong>“Frankie! My table is messy. I keep writing the same info over and over.”</strong> 
+      Frankie introduces <strong>Normalization</strong> to fix redundancy. 
+      Mia helps observe as they investigate, treating the tables like a crime scene — removing duplicates and organizing clues.
+      John sees how breaking big messy tables into smaller organized ones makes things clearer.
+      Ending: John laughs: “So the secret to being organized… is breaking up?” Frankie: “At least in databases, yes.”
+    </p>
+    <div class="modal-actions">
+      <button class="btn secondary" id="closeModalBtn">Read Later</button>
+      <button class="btn" id="beginBtn">Start Lesson</button>
+    </div>
+  </div>
+</div>
+
+  <!-- Floating database info -->
+  <div id="dbInfo">
+    <h3>Summary — Normalization & Database Design</h3>
+    <p><strong>1NF:</strong> Remove repeating groups and ensure each column holds atomic values.</p>
+    <p><strong>2NF:</strong> Remove partial dependencies; all non-key attributes depend on the full primary key.</p>
+    <p><strong>3NF:</strong> Remove transitive dependencies; non-key attributes depend only on primary keys.</p>
+    <table>
+      <thead>
+        <tr><th>StudentID</th><th>Name</th><th>Course</th><th>ProjectTitle</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>101</td><td>John</td><td>IT</td><td>Lost & Found ERD</td></tr>
+        <tr><td>102</td><td>Frankie</td><td>CS</td><td>Library System</td></tr>
+        <tr><td>103</td><td>Mia</td><td>IS</td><td>Inventory ERD</td></tr>
+      </tbody>
+    </table>
+    <p>Example: By normalizing, StudentID and Course are separated from ProjectTitle to reduce redundancy and organize data.</p>
+    <a href="quiz7.html" class="quiz-link-btn">Take Quiz 7</a>
+  </div>
+</body>
+</html>
+
+<script>
+  // ===============================
+  // Progress storage for monitor
+  // ===============================
+  function loadUserProgress(){
+    let users = JSON.parse(localStorage.getItem("users")) || {};
+    let currentUser = localStorage.getItem("loggedInUser") || "guest";
+    users[currentUser] = users[currentUser] || { progress:{} };
+    return { users, currentUser };
+  }
+
+  function saveUserProgress(users){
+    localStorage.setItem("users", JSON.stringify(users));
+  }
+
+  // ===============================
+  // DOM elements
+  // ===============================
+  const introModal = document.getElementById('introModal');
+  const beginBtn = document.getElementById('beginBtn');
+  const closeModalBtn = document.getElementById('closeModalBtn');
+  const startBtn = document.getElementById('startBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const skipBtn = document.getElementById('skipBtn');
+
+  const student1Img = document.getElementById('student1Img'); // Frankie
+  const student2Img = document.getElementById('student2Img'); // John
+  const student3Img = document.getElementById('student3Img'); // Mia
+
+  const student1Bubble = document.getElementById('student1Bubble');
+  const student2Bubble = document.getElementById('student2Bubble');
+  const student3Bubble = document.getElementById('student3Bubble');
+
+  const dbInfo = document.getElementById('dbInfo');
+
+  // ===============================
+  // Dialogue sequence
+  // ===============================
+  const sequence = [
+  {who:'student2', text:'Frankie! My table is messy again… I keep writing the same info over and over.'},
+  {who:'student1', text:'Hmm… looks like we have a classic case of redundancy, John.'},
+  {who:'student3', text:'Let’s investigate. First, let’s look at the data carefully.'},
+  {who:'student2', text:'*sifts through papers* Wow… there are so many duplicates here!'},
+  {who:'student1', text:'Exactly. This is why we need Normalization — to clean up the mess.'},
+  {who:'student3', text:'Think of it like a crime scene: each clue (or data piece) has its place.'},
+  {who:'student2', text:'So we’re detectives for our database now? 😂'},
+  {who:'student1', text:'In a way, yes. Let’s start with 1st Normal Form.'},
+  {who:'student3', text:'1NF means each column holds atomic values. No repeating groups.'},
+  {who:'student1', text:'Right. For example, if a student has multiple projects listed in one cell, split them into separate rows.'},
+  {who:'student2', text:'Ahhh… so each clue goes into its proper folder.'},
+  {who:'student3', text:'Exactly. Now onto 2nd Normal Form.'},
+  {who:'student1', text:'2NF removes partial dependencies. All non-key attributes must depend on the full primary key.'},
+  {who:'student2', text:'Wait… can you show me what that looks like in our table?'},
+  {who:'student3', text:'Sure. Look at StudentID + Course as a combined key. ProjectTitle should depend on the full key, not just part of it.'},
+  {who:'student1', text:'So if something depends only on StudentID, we separate it into another table.'},
+  {who:'student2', text:'I think I get it… this really is like sorting clues into proper evidence bags.'},
+  {who:'student3', text:'Yes, and it prevents mistakes later when analyzing data. By the way… you’re really quick at spotting duplicates. 😉'},
+  {who:'student1', text:'Now, 3rd Normal Form removes transitive dependencies.'},
+  {who:'student2', text:'Transitive dependencies… that’s like… one clue depending on another clue instead of the main case?'},
+  {who:'student3', text:'Exactly! Non-key attributes should only depend on primary keys. And John… you’re doing great here.'},
+  {who:'student1', text:'For instance, if a table has StudentName → Course → ProjectTitle, separate Course into its own table.'},
+  {who:'student2', text:'So we’re breaking the chain of indirect dependencies. And Mia… thanks for guiding me 😅'},
+  {who:'student3', text:'Hehe, anytime. It’s fun working with you.'},
+  {who:'student1', text:'Let’s take a messy table and break it into smaller ones.'},
+  {who:'student2', text:'*starts moving rows into new tables* Wow… it’s starting to look organized!'},
+  {who:'student3', text:'Notice how much easier it is to see relationships now. And John… I’m impressed by your patience.'},
+  {who:'student1', text:'Exactly. Normalization is like decluttering a messy room.'},
+  {who:'student2', text:'And every clue has its own place… I love it!'},
+  {who:'student3', text:'Also, it makes maintaining and updating data much safer. Plus, working with you is… nice. 😊'},
+  {who:'student1', text:'No more accidental duplicates, no more inconsistencies.'},
+  {who:'student2', text:'I feel like a true data detective now! And… Mia, I think I like solving cases with you.'},
+  {who:'student3', text:'*blushes* Mission accomplished… and I kinda like it too.'},
+  {who:'student1', text:'All tables are now in proper Normal Forms. 1NF, 2NF, 3NF, check!'},
+  {who:'student2', text:'So the secret to being organized… is breaking things into smaller, logical pieces? 😂'},
+  {who:'student3', text:'Yes, especially in databases. And… it’s sweeter when done together.'},
+  {who:'student1', text:'And by doing this, our ERD is clear, structured, and ready for implementation.'},
+  {who:'student2', text:'I can finally explain it without feeling lost.'},
+  {who:'student3', text:'Mission accomplished. Our database “crime scene” is clean! And John… we make a good team ❤️'}
+];
+  let idx = -1;
+
+  // ===============================
+  // Helper functions
+  // ===============================
+  function hideBubbles(){
+    student1Bubble.classList.remove('show');
+    student2Bubble.classList.remove('show');
+    student3Bubble.classList.remove('show');
+  }
+
+  function showItem(i){
+    if(i < 0 || i >= sequence.length) return;
+    const item = sequence[i];
+    hideBubbles();
+    setTimeout(()=>{
+      if(item.who==='student1'){
+        student1Bubble.textContent = item.text;
+        student1Bubble.classList.add('show');
+      } else if(item.who==='student2'){
+        student2Bubble.textContent = item.text;
+        student2Bubble.classList.add('show');
+      } else if(item.who==='student3'){
+        student3Bubble.textContent = item.text;
+        student3Bubble.classList.add('show');
+      }
+      nextBtn.disabled = false;
+    },180);
+  }
+
+  function markLessonComplete(){
+    let {users, currentUser} = loadUserProgress();
+    users[currentUser].progress.lesson7 = true;
+    saveUserProgress(users);
+    console.log("Lesson 7 marked complete ✅ for monitor");
+  }
+
+  // ===============================
+  // Navigation functions
+  // ===============================
+  function next(){
+    nextBtn.disabled = true;
+    idx++;
+    if(idx < sequence.length){
+      showItem(idx);
+    } else {
+      dbInfo.style.display = 'block';
+      markLessonComplete();
+    }
+  }
+
+  function startScene(){
+    idx = -1;
+    introModal.style.display='none';
+    student1Img.style.opacity='1';
+    student2Img.style.opacity='1';
+    student3Img.style.opacity='1';
+    student1Bubble.textContent='';
+    student2Bubble.textContent='';
+    student3Bubble.textContent='';
+    hideBubbles();
+    nextBtn.disabled=true;
+    setTimeout(()=>{ next(); },300);
+  }
+
+  // ===============================
+  // Event listeners
+  // ===============================
+  beginBtn.addEventListener('click', startScene);
+  startBtn.addEventListener('click', startScene);
+  nextBtn.addEventListener('click', next);
+  closeModalBtn.addEventListener('click', ()=> introModal.style.display='none');
+
+  skipBtn.addEventListener('click', ()=>{
+    let {users, currentUser} = loadUserProgress();
+    users[currentUser].progress.lesson7 = true;
+    users[currentUser].progress.quiz7 = true;
+    saveUserProgress(users);
+    window.location.href='quiz7.html';
+  });
+
+  // ===============================
+  // On page load
+  // ===============================
+  window.addEventListener("load", ()=>{
+    let {users, currentUser} = loadUserProgress();
+    if(users[currentUser].progress.lesson7){
+      console.log("Lesson 7 already completed ✅ but still replayable.");
+    }
+  });
+</script>

@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ERDucate Lesson1-Basic Concepts of Database Structure</title>
+  <link rel="icon" href="ERDucate.ico">
+  <style>
+   body {
+  font-family: 'Poppins', sans-serif;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 20px;
+  background-image: url("Quiz-Background-Lesson2.png");
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-attachment: fixed;
+  background-size: cover;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+header {
+  background-color: #800000;
+  color: #fff;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+header .title { 
+  font-size: 20px; 
+  font-weight: 600; 
+}
+
+header .btn-group a {
+  background: transparent;
+  border: 2px solid #fff;
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 14px;
+  transition: 0.3s ease;
+}
+
+header .btn-group a:hover {
+  background: #fff;
+  color: #800000;
+}
+
+h1 {
+  color: #800000;
+  text-align: center;
+  margin-top: 25px;
+}
+
+form { margin-top: 20px; }
+
+.question {
+  background: #fff;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.question h3 { 
+  margin: 0 0 10px; 
+  color: #800000; 
+}
+
+.question label { 
+  display: block; 
+  margin: 6px 0; 
+}
+
+button.submit-btn {
+  padding: 12px 20px;
+  background: #800000;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s ease;
+}
+
+footer {
+  text-align: center;
+  background: #800000;
+  color: #fff;
+  padding: 25px;
+  font-size: 13px;
+}
+
+.timer {
+  font-weight: bold;
+  font-size: 16px;
+  text-align: center;
+  margin-top: 10px;
+}
+
+/* Modal Styles */
+#resultModal {
+  position: fixed;
+  top:0; left:0;
+  width:100vw; height:100vh;
+  background: rgba(0,0,0,0.6);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 9999;
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 12px;
+  max-width: 600px;
+  width: 100%;
+  padding: 20px 25px;
+  text-align: left;
+  position: relative;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.modal-content h2 { 
+  color: #800000; 
+  margin-top:0; 
+}
+
+.modal-content ul { 
+  padding-left:20px; 
+  margin:15px 0; 
+}
+
+.modal-content button {
+  margin-top: 15px;
+  padding: 10px 18px;
+  border:none;
+  border-radius:8px;
+  font-weight:600;
+  background:#800000;
+  color:#fff;
+  cursor:pointer;
+}
+
+.modal-content button:hover { background:#a00000; }
+
+.close-btn {
+  position: absolute;
+  top:10px; right:15px;
+  background:transparent;
+  border:none;
+  font-size:22px;
+  cursor:pointer;
+  color:#666;
+}
+
+.close-btn:hover { color:#000; }
+
+#proceedBtn { opacity:0.5; pointer-events:none; }
+#proceedBtn.enabled { opacity:1; pointer-events:auto; }
+
+/* 🔽 RESPONSIVE DESIGN 🔽 */
+@media (max-width: 1024px) {
+  body {
+    padding: 0 15px;
+  }
+  header {
+    flex-wrap: wrap;
+    gap: 10px;
+    text-align: center;
+  }
+  header .title {
+    font-size: 18px;
+    flex: 1 1 100%;
+  }
+  header .btn-group {
+    flex: 1 1 100%;
+    justify-content: center;
+  }
+  .question {
+    padding: 12px;
+  }
+  h1 { font-size: 24px; }
+}
+
+@media (max-width: 768px) {
+  header {
+    flex-direction: column;
+    text-align: center;
+  }
+  header .btn-group {
+    margin-top: 10px;
+  }
+  body {
+    padding: 0 12px;
+  }
+  .question {
+    font-size: 14px;
+  }
+  h1 { font-size: 22px; }
+  button.submit-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  header .title { font-size: 16px; }
+  h1 { font-size: 20px; }
+  .question {
+    padding: 10px;
+    font-size: 13px;
+  }
+  .question h3 { font-size: 15px; }
+  button.submit-btn {
+    font-size: 14px;
+    padding: 10px 14px;
+    width: 100%;
+  }
+  footer {
+    font-size: 12px;
+    padding: 15px;
+  }
+  .modal-content {
+    padding: 15px;
+  }
+}
+
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="title">Quiz - Entities & Attributes</div>
+    <div class="btn-group">
+      <a href="Lesson3.html">📚 Back to Lesson</a>
+      <a href="index.html">🏠 Home</a>
+    </div>
+  </header>
+
+  <h1 class="Test">Quiz - Test Your Knowledge</h1>
+  <div class="timer">Time left: <span id="time">90</span>s</div>
+
+  <!-- Quiz Form -->
+<form id="quizForm">
+  <div class="question">
+    <h3>1. In John’s story, what do his Watch, Shirt, and Bag represent?</h3>
+    <label><input type="radio" name="q1" value="a"> Attributes</label>
+    <label><input type="radio" name="q1" value="b"> Entities</label>
+    <label><input type="radio" name="q1" value="c"> Data Types</label>
+  </div>
+
+  <div class="question">
+    <h3>2. Category, Color, Location, and Status are examples of what?</h3>
+    <label><input type="radio" name="q2" value="a"> Attributes</label>
+    <label><input type="radio" name="q2" value="b"> Entities</label>
+    <label><input type="radio" name="q2" value="c"> Tables</label>
+  </div>
+
+  <div class="question">
+    <h3>3. John described his Watch as Category: Accessory, Color: Black, Location: Desk, Status: Lost. What is this?</h3>
+    <label><input type="radio" name="q3" value="a"> An Attribute</label>
+    <label><input type="radio" name="q3" value="b"> A Record (Row)</label>
+    <label><input type="radio" name="q3" value="c"> A Data Type</label>
+  </div>
+
+  <div class="question">
+    <h3>4. Why is assigning a Data Type to an Attribute important?</h3>
+    <label><input type="radio" name="q4" value="a"> To decorate the table</label>
+    <label><input type="radio" name="q4" value="b"> To know what kind of data (Text, Number, Boolean) is stored</label>
+    <label><input type="radio" name="q4" value="c"> To alphabetize the records</label>
+  </div>
+
+  <div class="question">
+    <h3>5. When John tracked his Bag as Category: Backpack, Color: Red, Location: Bedroom, Status: With me, what did he create?</h3>
+    <label><input type="radio" name="q5" value="a"> An Attribute list without an Entity</label>
+    <label><input type="radio" name="q5" value="b"> A complete Record for the Entity</label>
+    <label><input type="radio" name="q5" value="c"> A Primary Key</label>
+  </div>
+
+ <div class="question">
+  <h3>6. A library wants to store information about Books. Which of the following is the best Entity?</h3>
+  <label><input type="radio" name="q6" value="a"> Title</label>
+  <label><input type="radio" name="q6" value="b"> Book</label>
+  <label><input type="radio" name="q6" value="c"> Author Name</label>
+</div>
+
+<div class="question">
+  <h3>7. In a Student database, “StudentID” is unique for each student. What should it be?</h3>
+  <label><input type="radio" name="q7" value="a"> An Attribute Value</label>
+  <label><input type="radio" name="q7" value="b"> A Foreign Key</label>
+  <label><input type="radio" name="q7" value="c"> A Primary Key</label>
+</div>
+
+<div class="question">
+  <h3>8. A hospital system records Patient Name, Age, Address, and Illness. What are these details considered?</h3>
+  <label><input type="radio" name="q8" value="a"> Entities</label>
+  <label><input type="radio" name="q8" value="b"> Tables</label>
+  <label><input type="radio" name="q8" value="c"> Attributes</label>
+</div>
+
+<div class="question">
+  <h3>9. A school stores information about Teachers and the Subjects they teach. “Teacher” and “Subject” are examples of:</h3>
+  <label><input type="radio" name="q9" value="a"> Entities</label>
+  <label><input type="radio" name="q9" value="b"> Attributes</label>
+  <label><input type="radio" name="q9" value="c"> Data Types</label>
+</div>
+
+<div class="question">
+  <h3>10. A supermarket database tracks ProductID, ProductName, Price, and Quantity. Why is ProductID important?</h3>
+  <label><input type="radio" name="q10" value="a"> It shows the Attribute Value of Price</label>
+  <label><input type="radio" name="q10" value="b"> It is used only for decoration</label>
+  <label><input type="radio" name="q10" value="c"> It is the Primary Key that uniquely identifies each product</label>
+</div>
+
+
+  <button type="submit" class="submit-btn">Submit</button>
+</form>
+
+  <!-- Result Modal -->
+  <div id="resultModal">
+    <div class="modal-content">
+      <button class="close-btn">&times;</button>
+      <h2>Quiz Results & Rationalization</h2>
+      <p id="scoreText"></p>
+      <ul id="rationalizationList"></ul>
+      <button id="proceedBtn">🎮 Proceed to Game</button>
+    </div>
+  </div>
+
+  <footer>
+    ERDucate Developer © 2025 | Technological University of the Philippines
+  </footer>
+
+  <script>
+    // ===== User Progress Setup =====
+    let users = JSON.parse(localStorage.getItem("users")) || {};
+    let currentUser = localStorage.getItem("loggedInUser") || "DemoUser";
+    if (!users[currentUser]) users[currentUser] = { progress: {} };
+
+    // ===== Quiz Answers & Rationalizations =====
+    const answers = {
+      q1: "b", // Entities
+      q2: "a", // Attributes
+      q3: "b", // Record
+      q4: "b", // Data Type importance
+      q5: "b", // Record
+      q6: "b", // Book = Entity
+      q7: "c", // Primary Key
+      q8: "c", // Attributes
+      q9: "a", // Entities
+      q10: "c" // Primary Key
+    };
+
+    const rationalizations = {
+      q1: "Correct: Watch, Shirt, and Bag are Entities because they are the main objects being tracked.",
+      q2: "Correct: Category, Color, Location, and Status are Attributes describing each Entity.",
+      q3: "Correct: A full set of Attribute values for one Entity forms a Record (Row).",
+      q4: "Correct: Data Types tell the system what kind of data each Attribute stores (Text, Number, Boolean).",
+      q5: "Correct: John created a complete Record for the Entity ‘Bag’.",
+      q6: "Correct: 'Book' is the Entity, while Title and Author are its Attributes.",
+      q7: "Correct: StudentID is unique for each student, so it must be the Primary Key.",
+      q8: "Correct: Name, Age, Address, and Illness are Attributes that describe a Patient.",
+      q9: "Correct: Teacher and Subject are Entities because they represent main objects in the database.",
+      q10: "Correct: ProductID is the Primary Key that uniquely identifies each product in the supermarket."
+    };
+
+    const form = document.getElementById("quizForm");
+    const modal = document.getElementById("resultModal");
+    const scoreText = document.getElementById("scoreText");
+    const rationalizationList = document.getElementById("rationalizationList");
+    const closeBtn = modal.querySelector(".close-btn");
+    const proceedBtn = document.getElementById("proceedBtn");
+    const timerEl = document.getElementById("time");
+
+    // ===== Timer =====
+    let timeLeft = 90;  
+    timerEl.textContent = timeLeft;
+    const timer = setInterval(()=> {
+      timeLeft--;
+      timerEl.textContent = timeLeft;
+      if (timeLeft <= 0) {
+        clearInterval(timer);
+        form.requestSubmit();
+      }
+    }, 1000);
+
+    // ===== Quiz Submit Handler =====
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+      clearInterval(timer);
+      let score = 0;
+      rationalizationList.innerHTML = "";
+
+      for (let i = 1; i <= 10; i++) {
+        let qName = "q" + i;
+        let selected = (form[qName] && form[qName].value) || "";
+        const li = document.createElement("li");
+        if (selected === answers[qName]) {
+          score++;
+          li.textContent = `✅ ${rationalizations[qName]}`;
+        } else {
+          li.textContent = `❌ ${rationalizations[qName]}`;
+        }
+        rationalizationList.appendChild(li);
+      }
+
+      scoreText.textContent = `You scored ${score} out of 10.`;
+
+      // ===== Update Progress & Unlock Proceed =====
+      if (score >= 7) {
+        users[currentUser].progress.quiz3 = true;
+        localStorage.setItem("users", JSON.stringify(users));
+        proceedBtn.classList.add("enabled");
+        proceedBtn.textContent = "Proceed to Game 1";
+      } else {
+        proceedBtn.classList.remove("enabled");
+        proceedBtn.textContent = "Score too low. Try again!";
+      }
+
+      modal.style.display = "flex";
+    });
+
+    // ===== Close Modal =====
+    closeBtn.addEventListener("click", () => { modal.style.display = "none"; });
+
+    // ===== Proceed Button =====
+    proceedBtn.addEventListener("click", () => {
+      if (users[currentUser].progress.quiz3) {
+        location.href = "game3.html";
+      }
+    });
+  </script>
+
+</body>
+</html>

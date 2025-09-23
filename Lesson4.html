@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ERDucate Web Based Module — Lesson 4</title>
+  <link rel="stylesheet" href="lesson4.css">
+  <link rel="icon" href="ERDucate.ico">
+</head>
+<style>
+  :root{
+  --maroon:#800000;
+  --bg:#f9f9f9;
+}
+body{
+  margin:0;
+  font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+  background: var(--bg); color:#222;
+}
+.page { max-width: 1000px; margin: 28px auto; padding: 0 16px; }
+h1{ text-align:center; color:var(--maroon); margin-bottom:14px; }
+
+.lesson-container {
+  position: relative;
+  width: 100%;
+  height: 520px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #eee;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.12);
+}
+.scene-bg {
+  position:absolute; inset:0;
+  background: url("Background1.jpg") center/cover no-repeat;
+  filter: brightness(0.92) saturate(1.05) contrast(1.1);
+}
+.characters { position: absolute; inset:0; pointer-events:none; }
+.teacher {
+  position:absolute;
+  bottom: 20px;
+  left: 10%;
+  width: 160px;
+  z-index: 6;
+  pointer-events:auto;
+  animation: teacherSway 1.8s infinite ease-in-out;
+}
+.student {
+  position:absolute;
+  bottom: 20px;
+  width: 120px;
+  z-index: 5;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: transform 0.6s ease, opacity 0.35s ease;
+}
+.student1 { left: 40%; }
+.student2 { left: 65%; }
+
+@keyframes teacherSway {
+  0% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-6px) rotate(-3deg); }
+  100% { transform: translateY(0) rotate(3deg); }
+}
+
+.speech {
+  position: absolute;
+  max-width: 340px;
+  background: #fff;
+  padding: 12px 14px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+  font-size: 16px;
+  line-height: 1.35;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.36s ease, transform 0.36s ease;
+  z-index: 9;
+}
+.speech.show { opacity: 1; transform: translateY(0); }
+.speech.teacher { left: 6%; bottom: 230px; text-align: left; }
+.speech.student { bottom: 230px; text-align: left; }
+
+/* Dynamic classes for student bubbles */
+.speech.student.frankie { left: calc(40% + 50px); right: auto; }
+.speech.student.john { left: calc(65% - 120px); right: auto; }
+
+.speech::after{
+  content:""; position:absolute; width:0; height:0; border-style:solid;
+}
+.speech.teacher::after{
+  left:18px; bottom:-10px;
+  border-width:10px 10px 0 10px;
+  border-color:#fff transparent transparent transparent;
+}
+.speech.student.frankie::after{
+  left:-10px; bottom:10px;
+  border-width:10px 10px 10px 0;
+  border-color:transparent #fff transparent transparent;
+}
+.speech.student.john::after{
+  right:-10px; bottom:10px;
+  border-width:10px 0 10px 10px;
+  border-color:transparent transparent transparent #fff;
+}
+
+.controls {
+  display:flex; justify-content:center; gap:14px; align-items:center; margin-top:14px;
+}
+.btn {
+  background: var(--maroon); color:#fff; padding:10px 18px; border-radius:8px; border:none;
+  cursor:pointer; font-weight:600; box-shadow: 0 6px 18px rgba(128,0,0,0.12);
+}
+.btn.secondary{ background:#fff; color:var(--maroon); border:2px solid var(--maroon); }
+.btn:active{ transform: translateY(1px); }
+
+.modal {
+  position: fixed; inset:0; display:flex; align-items:center; justify-content:center;
+  background: rgba(0,0,0,0.45); z-index: 9999;
+}
+.modal-card{
+  width: 92%; max-width:640px; background:#fff; border-radius:12px; padding:20px 22px;
+  box-shadow:0 14px 40px rgba(0,0,0,0.25); text-align:left;
+}
+.modal-card h2{ margin-top:0; color:var(--maroon); }
+.modal-card p{ margin:8px 0; line-height:1.45; }
+.modal-actions{ display:flex; justify-content:flex-end; gap:10px; margin-top:12px; }
+
+#dbInfo {
+  display:none;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 360px;
+  background: #fff;
+  border: 2px solid var(--maroon);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  z-index: 9999;
+}
+#dbInfo h3{ margin-top:0; color:var(--maroon); font-size:18px; }
+#dbInfo p{ font-size:14px; line-height:1.4; margin:6px 0; }
+#dbInfo table{ width:100%; border-collapse:collapse; margin:10px 0; font-size:13px; }
+#dbInfo th, #dbInfo td{ border:1px solid #999; padding:6px; text-align:center; }
+
+.quiz-link-btn{
+  display:block; margin-top:10px; text-align:center; padding:10px; background:var(--maroon);
+  color:#fff; border-radius:8px; text-decoration:none; font-weight:600;
+}
+
+/* ------------------- EXISTING ------------------- */
+@media (max-width:800px){
+  .teacher{ width:120px; }
+  .student{ width:100px; }
+  .speech{ max-width:260px; font-size:15px; }
+  #dbInfo{ width:280px; font-size:13px; }
+}
+@media (max-width:480px){
+  .lesson-container{ height:420px; }
+  .speech{ font-size:14px; bottom:180px; }
+  #dbInfo{ width:240px; font-size:12px; }
+}
+
+/* ------------------- NEW BREAKPOINTS ------------------- */
+@media (max-width:1024px){
+  .lesson-container { height: 480px; }
+  .teacher { width: 140px; left: 8%; }
+  .student1 { left: 38%; }
+  .student2 { left: 62%; }
+  .speech { max-width: 300px; font-size: 15px; }
+}
+
+@media (max-width:768px){
+  .lesson-container { height: 440px; }
+  .teacher { width: 120px; left: 6%; }
+  .student { width: 100px; }
+  .student1 { left: 36%; }
+  .student2 { left: 60%; }
+  .speech { max-width: 250px; font-size: 14px; bottom: 200px; }
+  #dbInfo { width: 280px; font-size: 13px; }
+}
+
+@media (max-width:480px){
+  .lesson-container { height: 400px; }
+  .teacher { width: 100px; left: 4%; }
+  .student { width: 90px; }
+  .student1 { left: 32%; }
+  .student2 { left: 55%; }
+  .speech { max-width: 220px; font-size: 13px; bottom: 160px; }
+  .speech.student.frankie, .speech.student.john { max-width: 200px; }
+  #dbInfo { width: 240px; font-size: 12px; }
+}
+
+</style>
+
+<body>
+  <div class="page">
+    <h1>Lesson 4 — Table Structures & Keys</h1>
+
+    <div class="modal-card" style="margin-bottom:18px;">
+      <h2>Lesson 4 Objectives</h2>
+      <p>At the end of the lesson, the student should be able to:</p>
+      <ul>
+        <li>Explain how Entities and Attributes are stored in Tables</li>
+        <li>Differentiate between Rows and Columns in a Table</li>
+        <li>Understand the importance of Primary Key and Foreign Key</li>
+        <li>Relate Tables and Keys to organizing real-life information</li>
+      </ul>
+    </div>
+
+    <div class="lesson-container">
+      <div class="scene-bg"></div>
+      <div class="characters">
+        <img src="TeacherLesson1.png" alt="Teacher" class="teacher" id="teacherImg">
+        <img src="studentfrankie.jpg" alt="Frankie" class="student student1" id="student1Img">
+        <img src="sTUDENT-jOHN.jpg" alt="John" class="student student2" id="student2Img">
+      </div>
+      <div class="speech teacher" id="teacherBubble"></div>
+      <div class="speech student" id="studentBubble"></div>
+    </div>
+
+    <div class="controls">
+      <button class="btn" id="startBtn">Start Lesson</button>
+      <button class="btn secondary" id="nextBtn" disabled>Next</button>
+      <button class="btn secondary" id="skipBtn">Skip to Quiz</button>
+    </div>
+  </div>
+
+ <!-- ✅ Intro Modal -->
+<div class="modal" id="introModal">
+  <div class="modal-card">
+    <h2>Intro — Story Outline</h2>
+    <p>
+      The next day, Frankie and John meet again in the classroom, joined by their Teacher. 
+      This time, the Teacher explains how the Entities and Attributes they learned about 
+      can be stored inside <strong>Tables</strong>. 
+      Frankie and John discover the role of <strong>Rows</strong>, <strong>Columns</strong>, 
+      <strong>Primary Keys</strong>, and <strong>Foreign Keys</strong> in making 
+      a database organized and powerful.
+    </p>
+    <div class="modal-actions">
+      <button class="btn secondary" id="closeModalBtn">Read Later</button>
+      <button class="btn" id="beginBtn">Start Story</button>
+    </div>
+  </div>
+</div>
+
+  <div id="dbInfo">
+    <h3>Summary — Tables & Keys</h3>
+    <p><strong>Table:</strong> Stores Entities (rows) and Attributes (columns).</p>
+    <p><strong>Primary Key:</strong> A unique identifier for each row (e.g., StudentID).</p>
+    <p><strong>Foreign Key:</strong> A column that links one table to another.</p>
+    <table>
+      <thead><tr><th>StudentID</th><th>Name</th><th>Age</th><th>Grade</th></tr></thead>
+      <tbody><tr><td>101</td><td>John</td><td>15</td><td>9</td></tr>
+             <tr><td>102</td><td>Frankie</td><td>15</td><td>9</td></tr></tbody>
+    </table>
+    <p>Example: StudentID in the Attendance Table is a Foreign Key that links back to the Student Table.</p>
+    <a href="quiz4.html" class="quiz-link-btn">Take Quiz 4</a>
+  </div>
+
+<script>
+function loadUserProgress(){
+  let users = JSON.parse(localStorage.getItem("users")) || {};
+  let currentUser = localStorage.getItem("loggedInUser") || "guest";
+  users[currentUser] = users[currentUser] || { progress:{} };
+  return { users, currentUser };
+}
+function saveUserProgress(users){ localStorage.setItem("users", JSON.stringify(users)); }
+
+const introModal=document.getElementById('introModal');
+const beginBtn=document.getElementById('beginBtn');
+const closeModalBtn=document.getElementById('closeModalBtn');
+const startBtn=document.getElementById('startBtn');
+const nextBtn=document.getElementById('nextBtn');
+const skipBtn=document.getElementById('skipBtn');
+const teacherImg=document.getElementById('teacherImg');
+const student1Img=document.getElementById('student1Img');
+const student2Img=document.getElementById('student2Img');
+const teacherBubble=document.getElementById('teacherBubble');
+const studentBubble=document.getElementById('studentBubble');
+const dbInfo=document.getElementById('dbInfo');
+
+const sequence=[
+  {who:'teacher', text:'Good morning, Frankie and John. I heard that Frankie helped you understand Entities and Attributes.'},
+  {who:'student2', text:'Yes, Ma’am! I already understand Entities and Attributes, but how do I put them into a system?'},
+  {who:'teacher', text:'Great question, John! Entities and Attributes are stored in something we call Tables.'},
+  {who:'student1', text:'So each row represents one Entity, like a student, and each column is an Attribute, like name, section, or grade.'},
+  {who:'teacher', text:'Exactly, Frankie. Imagine a Student Table...'},
+  {who:'student2', text:'Ah! So if there are two students with the same name John, how do we make sure they don’t get mixed up?'},
+  {who:'teacher', text:'Good point! That’s why we use a Primary Key...'},
+  {who:'student2', text:'Like a Student ID that’s unique for every student!'},
+  {who:'teacher', text:'Correct, John!...'},
+  {who:'student1', text:'Ma’am, what about connecting tables together?'},
+  {who:'teacher', text:'Another excellent question. That’s where the Foreign Key comes in.'},
+  {who:'student1', text:'So if there’s an Attendance Table, it should also have Student ID to link it to the Student Table.'},
+  {who:'teacher', text:'Perfect example, Frankie...'},
+  {who:'student2', text:'So that means when I look at the Attendance Table...'},
+  {who:'teacher', text:'Exactly, John. And this kind of connection is what we call a Relationship.'},
+  {who:'student1', text:'Wow! So relationships make it possible to combine information...'},
+  {who:'teacher', text:'Correct, Frankie!...'},
+  {who:'student2', text:'Now I understand, Ma’am...'},
+  {who:'teacher', text:'That’s right, John!...'},
+  {who:'student1', text:'That means if we know how to use databases...'},
+  {who:'teacher', text:'Exactly! And as we move forward...'},
+  {who:'student2', text:'That makes me more excited to learn SQL!'},
+  {who:'teacher', text:'That’s the spirit, John!'}
+];
+let idx=-1;
+
+function hideBubbles(){
+  teacherBubble.classList.remove('show');
+  studentBubble.classList.remove('show','frankie','john');
+  teacherBubble.textContent='';  // ✅ clear text to avoid ghost words
+  studentBubble.textContent='';
+}
+
+function showItem(i){
+  if(i<0 || i>=sequence.length) return;
+  const item=sequence[i];
+  hideBubbles();
+  setTimeout(()=>{
+    if(item.who==='teacher'){
+      teacherBubble.textContent="Teacher: "+(item.text||'');
+      teacherBubble.classList.add('show');
+    }else if(item.who==='student1'){
+      studentBubble.textContent="Frankie: "+(item.text||'');
+      studentBubble.classList.add('frankie','show');
+      student1Img.style.opacity='1';
+      student1Img.style.transform='translateY(0)';
+    }else if(item.who==='student2'){
+      studentBubble.textContent="John: "+(item.text||'');
+      studentBubble.classList.add('john','show');
+      student2Img.style.opacity='1';
+      student2Img.style.transform='translateY(0)';
+    }
+    nextBtn.disabled=false;
+  },180);
+}
+
+function markLessonComplete(){
+  let {users,currentUser}=loadUserProgress();
+  users[currentUser].progress.lesson4=true;
+  saveUserProgress(users);
+}
+
+function next(){
+  nextBtn.disabled=true;
+  idx++;
+  if(idx<sequence.length){ showItem(idx); }
+  else{ dbInfo.style.display='block'; markLessonComplete(); }
+}
+
+function startScene(){
+  idx=-1;
+  introModal.style.display='none';
+  teacherImg.style.opacity='1';
+  student1Img.style.opacity='0';
+  student2Img.style.opacity='0';
+  hideBubbles();
+  nextBtn.disabled=true;
+  setTimeout(()=>{ next(); },300);
+}
+
+beginBtn.addEventListener('click', startScene);
+startBtn.addEventListener('click', startScene);
+nextBtn.addEventListener('click', next);
+closeModalBtn.addEventListener('click',()=>introModal.style.display='none');
+skipBtn.addEventListener('click',()=>{
+  let {users,currentUser}=loadUserProgress();
+  users[currentUser].progress.lesson4=true;
+  users[currentUser].progress.quiz4=true;
+  saveUserProgress(users);
+  window.location.href='quiz4.html';
+});
+window.addEventListener("load",()=>{
+  let {users,currentUser}=loadUserProgress();
+  if(users[currentUser].progress.lesson4){
+    console.log("Lesson 4 already completed ✅ but still replayable.");
+  }
+});
+</script>
+</body>
+</html>

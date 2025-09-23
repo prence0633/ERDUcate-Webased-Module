@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ERDucate Web Based Module — Lesson 6</title>
+  <link rel="icon" href="ERDucate.ico">
+  <style>
+    :root{ 
+  --maroon:#800000;
+  --bg:#f9f9f9;
+}
+body{
+  margin:0;
+  font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+  background: var(--bg); color:#222;
+}
+.page { max-width: 1000px; margin: 28px auto; padding: 0 16px; }
+h1{ text-align:center; color:var(--maroon); margin-bottom:14px; }
+
+/* Lesson Scene */
+.lesson-container {
+  position: relative;
+  width: 100%;
+  height: 520px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #eee;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.12);
+}
+.scene-bg {
+  position:absolute; inset:0;
+  background: url("Background1.jpg") center/cover no-repeat;
+  filter: brightness(0.92) saturate(1.05) contrast(1.1);
+}
+
+/* Characters */
+.characters { position: absolute; inset:0; pointer-events:none; }
+.teacher {
+  position:absolute; bottom: 20px; left: 10%; width: 160px; z-index: 6;
+  pointer-events:auto; animation: teacherSway 1.8s infinite ease-in-out;
+}
+.student {
+  position:absolute; bottom: 20px; width: 120px; z-index: 5; opacity: 0;
+  transform: translateY(20px); transition: transform 0.6s ease, opacity 0.35s ease;
+}
+.student1 { left: 40%; }
+.student2 { left: 65%; }
+
+@keyframes teacherSway {
+  0% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-6px) rotate(-3deg); }
+  100% { transform: translateY(0) rotate(3deg); }
+}
+
+/* Speech bubbles */
+.speech {
+  position: absolute;
+  max-width: 280px;
+  background: #fff;
+  padding: 10px 14px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+  font-size: 16px;
+  line-height: 1.35;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.36s ease, transform 0.36s ease;
+  z-index: 9;
+}
+.speech.show { opacity: 1; transform: translateY(0); }
+
+/* Teacher bubble */
+.speech.teacher {
+  bottom: 220px;
+  left: 180px; /* right next to teacher image */
+  text-align: left;
+}
+.speech.teacher::after{
+  left: -10px;
+  top: 12px;
+  border-width: 10px;
+  border-style: solid;
+  border-color: transparent #fff transparent transparent;
+  position: absolute;
+  content: "";
+}
+
+/* Frankie bubble */
+.speech.student1-bubble {
+  bottom: 220px;
+  left: 300px; /* right next to Frankie */
+  text-align: left;
+}
+.speech.student1-bubble::after{
+  left: -10px;
+  top: 12px;
+  border-width: 10px;
+  border-style: solid;
+  border-color: transparent #fff transparent transparent;
+  position: absolute;
+  content: "";
+}
+
+/* John bubble */
+.speech.student2-bubble {
+  bottom: 220px;
+  left: 520px; /* right next to John */
+  text-align: left;
+}
+.speech.student2-bubble::after{
+  left: -10px;
+  top: 12px;
+  border-width: 10px;
+  border-style: solid;
+  border-color: transparent #fff transparent transparent;
+  position: absolute;
+  content: "";
+}
+
+/* Controls */
+.controls {
+  display:flex; justify-content:center; gap:14px; align-items:center; margin-top:14px;
+}
+.btn {
+  background: var(--maroon); color:#fff; padding:10px 18px; border-radius:8px; border:none;
+  cursor:pointer; font-weight:600; box-shadow: 0 6px 18px rgba(128,0,0,0.12);
+}
+.btn.secondary{ background:#fff; color:var(--maroon); border:2px solid var(--maroon); }
+.btn:active{ transform: translateY(1px); }
+
+/* Modal */
+.modal {
+  position: fixed; inset:0; display:flex; align-items:center; justify-content:center;
+  background: rgba(0,0,0,0.45); z-index: 9999;
+}
+.modal-card{
+  width: 92%; max-width:640px; background:#fff; border-radius:12px; padding:20px 22px;
+  box-shadow:0 14px 40px rgba(0,0,0,0.25); text-align:left;
+}
+.modal-card h2{ margin-top:0; color:var(--maroon); }
+.modal-card p{ margin:8px 0; line-height:1.45; }
+.modal-actions{ display:flex; justify-content:flex-end; gap:10px; margin-top:12px; }
+
+/* DB Info */
+#dbInfo {
+  display:none;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 360px;
+  background: #fff;
+  border: 2px solid var(--maroon);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  z-index: 9999;
+}
+#dbInfo h3{ margin-top:0; color:var(--maroon); font-size:18px; }
+#dbInfo p{ font-size:14px; line-height:1.4; margin:6px 0; }
+#dbInfo table{ width:100%; border-collapse:collapse; margin:10px 0; font-size:13px; }
+#dbInfo th, #dbInfo td{ border:1px solid #999; padding:6px; text-align:center; }
+
+.quiz-link-btn{
+  display:block; margin-top:10px; text-align:center; padding:10px; background:var(--maroon);
+  color:#fff; border-radius:8px; text-decoration:none; font-weight:600;
+}
+
+/* Existing Responsiveness */
+@media (max-width:800px){
+  .teacher{ width:120px; }
+  .student{ width:100px; }
+  .speech{ max-width:220px; font-size:15px; }
+  #dbInfo{ width:280px; font-size:13px; }
+}
+@media (max-width:480px){
+  .lesson-container{ height:420px; }
+  .speech{ font-size:14px; bottom:180px; }
+  #dbInfo{ width:240px; font-size:12px; }
+}
+
+/* ---------------------- */
+/* EXTRA RESPONSIVENESS   */
+/* ---------------------- */
+
+/* Tablet Landscape / Small Desktop (≤ 1024px) */
+@media (max-width: 1024px) {
+  .page { max-width: 90%; }
+  .lesson-container { height: 480px; }
+  .teacher { left: 8%; width: 140px; }
+  .student1 { left: 38%; }
+  .student2 { left: 62%; }
+  .speech { max-width: 250px; font-size: 15px; }
+}
+
+/* Tablet Portrait (≤ 768px) */
+@media (max-width: 768px) {
+  .lesson-container { height: 440px; }
+  .teacher { left: 5%; width: 120px; }
+  .student { width: 95px; }
+  .student1 { left: 34%; }
+  .student2 { left: 58%; }
+  .speech { max-width: 200px; font-size: 14px; }
+  .speech.teacher, .speech.student1-bubble, .speech.student2-bubble { bottom: 200px; left: auto; right: 10px; }
+}
+
+/* Mobile (≤ 480px) */
+@media (max-width: 480px) {
+  .lesson-container { height: 380px; }
+  .teacher { left: 3%; width: 100px; }
+  .student { width: 80px; }
+  .student1 { left: 30%; }
+  .student2 { left: 55%; }
+  .speech { max-width: 180px; font-size: 13px; padding: 8px 10px; }
+  h1 { font-size: 20px; }
+  .controls { flex-direction: column; gap: 8px; }
+}
+
+  </style>
+<body>
+  <div class="page">
+    <h1>Lesson 6 — Data Types & Designing the ERD</h1>
+
+    <!-- Lesson Objectives -->
+    <div class="modal-card" style="margin-bottom:18px;">
+      <h2>Lesson 6 Objectives</h2>
+      <p>At the end of the lesson, the student should be able to:</p>
+      <ul>
+        <li>Identify different Data Types (Text, Number, Date, Boolean) for attributes</li>
+        <li>Explain why choosing the correct Data Type prevents errors</li>
+        <li>Understand the purpose and structure of an Entity-Relationship Diagram (ERD)</li>
+        <li>Create a simple ERD for a real-life system</li>
+      </ul>
+    </div>
+
+    <!-- Story Scene -->
+    <div class="lesson-container">
+      <div class="scene-bg"></div>
+      <div class="characters">
+        <img src="TeacherLesson1.png" alt="Teacher" class="teacher" id="teacherImg">
+        <img src="studentfrankie.jpg" alt="Frankie" class="student student1" id="student1Img">
+        <img src="sTUDENT-jOHN.jpg" alt="John" class="student student2" id="student2Img">
+      </div>
+      <!-- Bubbles -->
+      <div class="speech teacher" id="teacherBubble"></div>
+      <div class="speech student1-bubble" id="student1Bubble"></div>
+      <div class="speech student2-bubble" id="student2Bubble"></div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <button class="btn" id="startBtn">Start Lesson</button>
+      <button class="btn secondary" id="nextBtn" disabled>Next</button>
+      <button class="btn secondary" id="skipBtn">Skip to Quiz</button>
+    </div>
+  </div>
+
+  <!-- Intro Modal -->
+ <div class="modal" id="introModal">
+  <div class="modal-card">
+    <h2>Intro — Lesson Overview</h2>
+    <p>
+      Today, the Teacher guides Frankie and John in learning about <strong>Data Types</strong> 
+      and how to design an <strong>Entity-Relationship Diagram (ERD)</strong>. 
+      Frankie brings papers, and John brings markers to help visualize their system. 
+      While John jokingly doodles stick figures instead of tables, Frankie reminds him that 
+      they are creating an ERD, not a comic strip. 
+      Through this activity, they explore how attributes, data types, and relationships connect 
+      in a database system.
+    </p>
+    <div class="modal-actions">
+      <button class="btn secondary" id="closeModalBtn">Read Later</button>
+      <button class="btn" id="beginBtn">Start Lesson</button>
+    </div>
+  </div>
+</div>
+
+
+  <!-- Floating database info -->
+  <div id="dbInfo">
+    <h3>Summary — Data Types & ERD</h3>
+    <p><strong>Data Types:</strong> Text, Number, Date, Boolean — assign correctly to avoid errors.</p>
+    <p><strong>ERD:</strong> Diagram showing Entities, Attributes, and Relationships.</p>
+    <table>
+      <thead>
+        <tr><th>ItemID</th><th>ItemName</th><th>DateFound</th><th>IsClaimed</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>201</td><td>Umbrella</td><td>2025-09-15</td><td>false</td></tr>
+        <tr><td>202</td><td>Notebook</td><td>2025-09-16</td><td>true</td></tr>
+      </tbody>
+    </table>
+    <p>Example: <em>DateFound</em> must be a Date type to calculate how long items remain unclaimed.</p>
+    <a href="quiz6.html" class="quiz-link-btn">Take Quiz 6</a>
+  </div>
+</body>
+</html>
+
+ <script>
+  // ===============================
+  // Progress storage for monitor
+  // ===============================
+  function loadUserProgress(){
+    let users = JSON.parse(localStorage.getItem("users")) || {};
+    let currentUser = localStorage.getItem("loggedInUser") || "guest";
+    users[currentUser] = users[currentUser] || { progress:{} };
+    return { users, currentUser };
+  }
+
+  function saveUserProgress(users){
+    localStorage.setItem("users", JSON.stringify(users));
+  }
+
+  // ===============================
+  // Dialogue sequence
+  // ===============================
+  const sequence = [
+    {who:'teacher', text:'Good day, Frankie and John! Today we will dive into Data Types and how to use them when designing an ERD.'},
+    {who:'student1', text:'Yay! I’m excited to start drawing tables and organizing our data!'},
+    {who:'student2', text:'I brought markers… but I might doodle stick figures instead of tables 😂'},
+    {who:'teacher', text:'Haha, John, remember, we are making an ERD, not a comic strip! Let’s start with Data Types.'},
+    {who:'teacher', text:'Attributes in a table need a Data Type: Text, Number, Date, and Boolean.'},
+    {who:'student1', text:'Can you explain each one, Ma’am?'},
+    {who:'teacher', text:'Text is for words or letters, like a student’s Name or ItemName.'},
+    {who:'student2', text:'Ah, so I can’t put a number like 123 in a Name column, right?'},
+    {who:'teacher', text:'Correct! Number is for numeric values, like Age, ItemID, or Quantity.'},
+    {who:'student1', text:'Got it. And Date is for dates like Birthday or DateFound in our Lost & Found system?'},
+    {who:'teacher', text:'Exactly. Using Date allows calculations, like how long an item has been unclaimed.'},
+    {who:'student2', text:'And Boolean? What is that used for?'},
+    {who:'teacher', text:'Boolean is True or False. For example, IsClaimed is True if an item was claimed, False if still unclaimed.'},
+    {who:'student1', text:'So each attribute has a proper type to avoid errors in the system.'},
+    {who:'teacher', text:'Exactly, Frankie. Choosing the correct Data Type is the first step before building your ERD.'},
+    {who:'teacher', text:'Now, let’s connect this to the ERD. Each entity becomes a table, and each attribute becomes a column with the correct Data Type.'},
+    {who:'student2', text:'So the Item table might have ItemID as Number, ItemName as Text, DateFound as Date, and IsClaimed as Boolean?'},
+    {who:'teacher', text:'Perfect! And the Student table might have StudentID as Number, Name as Text, Age as Number, and Birthday as Date.'},
+    {who:'student1', text:'How do we show relationships between these tables?'},
+    {who:'teacher', text:'We use Primary Keys and Foreign Keys. Primary Key uniquely identifies each row, like StudentID in the Student table.'},
+    {who:'teacher', text:'Foreign Keys link tables. For example, StudentID in the Claim table connects back to the Student table.'},
+    {who:'student2', text:'Oh, so the ERD visually shows how tables, attributes, and relationships fit together!'},
+    {who:'student1', text:'I can see it now! The Data Types help define each column, and the keys connect the tables.'},
+    {who:'teacher', text:'Exactly, Frankie. By deciding on Data Types first, your ERD becomes accurate and useful before implementation.'},
+    {who:'student2', text:'I think I’m ready to draw the ERD for our Lost & Found system now!'},
+    {who:'student1', text:'Me too! Let’s make sure each table has the right Data Types and keys.'},
+    {who:'teacher', text:'Great work! Once you finish, your ERD will show all entities, attributes with Data Types, and relationships clearly. That’s the power of good database design!'}
+  ];
+
+
+  let idx = -1;
+
+  // ===============================
+// Helper functions
+// ===============================
+
+// ===============================
+// Hide all speech bubbles
+// ===============================
+function hideBubbles() {
+  teacherBubble.classList.remove('show');
+  student1Bubble.classList.remove('show');
+  student2Bubble.classList.remove('show');
+}
+
+// ===============================
+// Show the current item in the sequence
+// ===============================
+function showItem(i) {
+  if (i < 0 || i >= sequence.length) return; // safety check
+  const item = sequence[i];
+
+  // Hide all bubbles first
+  hideBubbles();
+
+  // Show the bubble and make character visible
+  switch(item.who) {
+    case 'teacher':
+      teacherBubble.textContent = item.text;
+      teacherBubble.classList.add('show');
+      break;
+
+    case 'student1': // Frankie
+      student1Bubble.textContent = "Frankie: " + item.text;
+      student1Bubble.classList.add('show');
+
+      // Animate Frankie image in
+      student1Img.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+      student1Img.style.opacity = '1';
+      student1Img.style.transform = 'translateY(0)';
+      break;
+
+    case 'student2': // John
+      student2Bubble.textContent = "John: " + item.text;
+      student2Bubble.classList.add('show');
+
+      // Animate John image in
+      student2Img.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+      student2Img.style.opacity = '1';
+      student2Img.style.transform = 'translateY(0)';
+      break;
+
+    case 'students': // Both speak
+      student1Bubble.textContent = "Frankie: " + item.text;
+      student2Bubble.textContent = "John: " + item.text;
+      student1Bubble.classList.add('show');
+      student2Bubble.classList.add('show');
+
+      // Animate both images in
+      student1Img.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+      student2Img.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+      student1Img.style.opacity = '1';
+      student1Img.style.transform = 'translateY(0)';
+      student2Img.style.opacity = '1';
+      student2Img.style.transform = 'translateY(0)';
+      break;
+  }
+
+  // Enable the next button immediately
+  nextBtn.disabled = false;
+}
+
+
+  function markLessonComplete(){
+    let {users, currentUser} = loadUserProgress();
+    users[currentUser].progress.lesson6 = true;
+    saveUserProgress(users);
+    console.log("Lesson 6 marked complete ✅ for monitor");
+  }
+
+  // ===============================
+  // Navigation functions
+  // ===============================
+  function next(){
+    nextBtn.disabled = true;
+    idx++;
+    if(idx < sequence.length){
+      showItem(idx);
+    } else {
+      dbInfo.style.display = 'block';
+      markLessonComplete();
+    }
+  }
+
+  function startScene(){
+    idx = -1;
+    introModal.style.display='none';
+    teacherImg.style.opacity='1';
+    student1Img.style.opacity='0';
+    student2Img.style.opacity='0';
+    teacherBubble.textContent='';
+    student1Bubble.textContent='';
+    student2Bubble.textContent='';
+    hideBubbles();
+    nextBtn.disabled=true;
+    setTimeout(()=>{ next(); },300);
+  }
+
+  // ===============================
+  // Event listeners
+  // ===============================
+  beginBtn.addEventListener('click', startScene);
+  startBtn.addEventListener('click', startScene);
+  nextBtn.addEventListener('click', next);
+  closeModalBtn.addEventListener('click', ()=> introModal.style.display='none');
+
+  skipBtn.addEventListener('click', ()=>{
+    let {users, currentUser} = loadUserProgress();
+    users[currentUser].progress.lesson6 = true;
+    users[currentUser].progress.quiz6 = true;
+    saveUserProgress(users);
+    window.location.href='quiz6.html';
+  });
+
+  // ===============================
+  // On page load
+  // ===============================
+  window.addEventListener("load", ()=>{
+    let {users, currentUser} = loadUserProgress();
+    if(users[currentUser].progress.lesson6){
+      console.log("Lesson 6 already completed ✅ but still replayable.");
+    }
+  });
+</script>
+ 

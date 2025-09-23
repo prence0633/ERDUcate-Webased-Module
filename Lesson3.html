@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ERDucate Web Based Module — Lesson 3</title>
+  <link rel="stylesheet" href="lesson3.css">
+  <link rel="icon" href="ERDucate.ico">
+  <style>
+   :root {
+  --maroon: #800000;
+  --bg: #f9f9f9;
+}
+body {
+  margin: 0;
+  font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+  background: var(--bg);
+  color: #222;
+}
+.page {
+  max-width: 1000px;
+  margin: 28px auto;
+  padding: 0 16px;
+}
+h1 {
+  text-align: center;
+  color: var(--maroon);
+  margin-bottom: 14px;
+}
+
+/* ================= LESSON SCENE ================= */
+.lesson-container {
+  position: relative;
+  width: 100%;
+  height: 520px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #eee;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.12);
+}
+.scene-bg {
+  position: absolute;
+  inset: 0;
+  background: url("Background4.jpg") center/cover no-repeat;
+  filter: brightness(0.92) saturate(1.05) contrast(1.1);
+}
+.characters {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.teacher {
+  position: absolute;
+  bottom: 20px;
+  left: 10%;
+  width: 160px;
+  z-index: 6;
+  pointer-events: auto;
+  animation: teacherSway 1.8s infinite ease-in-out;
+}
+.student {
+  position: absolute;
+  bottom: 20px;
+  width: 120px;
+  z-index: 5;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: transform 0.6s ease, opacity 0.35s ease;
+}
+.student1 { left: 45%; }
+
+@keyframes teacherSway {
+  0% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-6px) rotate(-3deg); }
+  100% { transform: translateY(0) rotate(3deg); }
+}
+
+/* ================= SPEECH BUBBLES ================= */
+.speech {
+  position: absolute;
+  max-width: 340px;
+  background: #fff;
+  padding: 12px 14px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+  font-size: 16px;
+  line-height: 1.35;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.36s ease, transform 0.36s ease;
+  z-index: 9;
+}
+.speech.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+.speech.teacher {
+  left: 6%;
+  bottom: 230px;
+  text-align: left;
+}
+.speech.student {
+  right: 6%;
+  bottom: 230px;
+  text-align: left;
+}
+
+.speech::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-style: solid;
+}
+.speech.teacher::after {
+  left: 18px;
+  bottom: -10px;
+  border-width: 10px 10px 0 10px;
+  border-color: #fff transparent transparent transparent;
+}
+.speech.student::after {
+  right: 18px;
+  bottom: -10px;
+  border-width: 10px 10px 0 10px;
+  border-color: #fff transparent transparent transparent;
+}
+
+/* ✅ Frankie & John bubbles positioned properly */
+.speech.frankie {
+  left: 22%;
+  bottom: 240px;
+  max-width: 300px;
+}
+.speech.frankie::after {
+  left: 20px;
+  bottom: -10px;
+  border-width: 10px 10px 0 10px;
+  border-color: #fff transparent transparent transparent;
+}
+
+.speech.john {
+  right: 22%;
+  bottom: 240px;
+  max-width: 300px;
+}
+.speech.john::after {
+  right: 20px;
+  bottom: -10px;
+  border-width: 10px 10px 0 10px;
+  border-color: #fff transparent transparent transparent;
+}
+
+/* ================= BUTTONS ================= */
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  align-items: center;
+  margin-top: 14px;
+}
+.btn {
+  background: var(--maroon);
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 6px 18px rgba(128,0,0,0.12);
+}
+.btn.secondary {
+  background: #fff;
+  color: var(--maroon);
+  border: 2px solid var(--maroon);
+}
+.btn:active { transform: translateY(1px); }
+
+/* ================= MODALS & POPUPS ================= */
+.modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.45);
+  z-index: 9999;
+}
+.modal-card {
+  width: 92%;
+  max-width: 640px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px 22px;
+  box-shadow: 0 14px 40px rgba(0,0,0,0.25);
+  text-align: left;
+}
+.modal-card h2 { margin-top: 0; color: var(--maroon); }
+.modal-card p { margin: 8px 0; line-height: 1.45; }
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+#dbInfo {
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 340px;
+  background: #fff;
+  border: 2px solid var(--maroon);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  z-index: 9999;
+}
+#dbInfo h3 { margin-top: 0; color: var(--maroon); font-size: 18px; }
+#dbInfo table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 13px; }
+#dbInfo th, #dbInfo td { border: 1px solid #999; padding: 6px; text-align: center; }
+
+.mini-quiz button {
+  display: block;
+  width: 100%;
+  margin: 4px 0;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid var(--maroon);
+  background: #fff;
+  cursor: pointer;
+}
+.mini-quiz button.correct { background: #d4edda; border-color: #28a745; }
+.mini-quiz button.wrong { background: #f8d7da; border-color: #dc3545; }
+
+.quiz-link-btn {
+  display: block;
+  margin-top: 10px;
+  text-align: center;
+  padding: 10px;
+  background: var(--maroon);
+  color: #fff;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+/* ================= RESPONSIVE DESIGN ================= */
+@media (max-width: 1024px) {
+  .lesson-container { height: 480px; }
+  .teacher { left: 6%; width: 140px; }
+  .student1 { left: 40%; }
+  .speech { max-width: 300px; font-size: 15px; }
+}
+
+@media (max-width: 768px) {
+  .lesson-container { height: 440px; }
+  .teacher { width: 120px; }
+  .student { width: 100px; }
+  .student1 { left: 38%; }
+  .speech { max-width: 260px; font-size: 15px; bottom: 200px; }
+  #dbInfo { width: 280px; font-size: 13px; }
+}
+
+@media (max-width: 480px) {
+  .lesson-container { height: 400px; }
+  .teacher { left: 4%; width: 100px; }
+  .student { width: 90px; }
+  .speech { font-size: 14px; max-width: 230px; bottom: 160px; }
+  .speech.frankie, .speech.john { max-width: 220px; bottom: 160px; }
+  #dbInfo { width: 240px; font-size: 12px; }
+}
+
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <h1>Lesson 3 — Tracking Personal Items Using Entities and Attributes</h1>
+
+    <!-- Lesson Objectives -->
+    <div class="modal-card" style="margin-bottom:18px;">
+      <h2>Lesson 3 Objectives</h2>
+      <p>At the end of the lesson, the student should be able to:</p>
+      <ul>
+        <li>Explain what <strong>Entities</strong> and <strong>Attributes</strong> are</li>
+        <li>Identify Entities and Attributes from real-life examples</li>
+        <li>Assign proper data types to Attributes</li>
+        <li>Understand how organizing Entities and Attributes is like a simple personal database</li>
+      </ul>
+    </div>
+
+    <!-- Story Scene -->
+    <div class="lesson-container">
+      <div class="scene-bg"></div>
+      <div class="characters">
+        <img src="studentfrankie.jpg" alt="Frankie" class="teacher" id="teacherImg">
+        <img src="sTUDENT-jOHN.jpg" alt="John" class="student student1" id="student1Img">
+      </div>
+      <!-- Speech bubbles -->
+      <div class="speech teacher" id="teacherBubble"></div>
+      <div class="speech student" id="studentBubble"></div>
+      <div class="speech frankie" id="frankieBubble"></div>
+      <div class="speech john" id="johnBubble"></div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <button class="btn" id="startBtn">Start Lesson</button>
+      <button class="btn secondary" id="nextBtn" disabled>Next</button>
+      <button class="btn secondary" id="skipBtn">Skip to Quiz</button>
+    </div>
+  </div>
+
+  <!-- Intro Modal -->
+  <div class="modal" id="introModal">
+    <div class="modal-card">
+      <h2>Intro — Story Outline</h2>
+      <p>
+        After class, John feels frustrated because he always loses track of his personal items—like his watch, shirt, and bag.
+        Frankie notices his problem and decides to help by showing him a simple way to organize things.
+        Through their peer-to-peer conversation, Frankie introduces John to the concepts of
+        <strong>Entities</strong>, <strong>Attributes</strong>, and <strong>Data Types</strong>.
+        By the end of the lesson, John realizes that keeping track of his belongings is just like building a mini-database.
+      </p>
+      <div class="modal-actions">
+        <button class="btn secondary" id="closeModalBtn">Read Later</button>
+        <button class="btn" id="beginBtn">Start Story</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating database info -->
+  <div id="dbInfo">
+    <h3>Summary — Entities & Attributes</h3>
+    <p><strong>Entity:</strong> Any object or item you want to track (e.g., Watch, Bag, Shirt)</p>
+    <p><strong>Attribute:</strong> Details that describe the entity (e.g., Category, Color, Location, Status)</p>
+    <p><strong>Data Types:</strong> Text, Number, Boolean, Date, etc.</p>
+    <table>
+      <thead>
+        <tr><th>Item</th><th>Category</th><th>Color</th><th>Location</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Watch</td><td>Accessory</td><td>Black</td><td>Desk</td><td>Lost</td></tr>
+        <tr><td>Shirt</td><td>Clothing</td><td>Blue</td><td>Closet</td><td>Found</td></tr>
+        <tr><td>Bag</td><td>Backpack</td><td>Red</td><td>Bedroom</td><td>With me</td></tr>
+      </tbody>
+    </table>
+    <div class="mini-quiz">
+      <p><strong>Check Yourself:</strong> Which of these is an Attribute of the Watch?</p>
+      <button onclick="checkAnswer(this,true)">Color</button>
+      <button onclick="checkAnswer(this,false)">Desk</button>
+      <button onclick="checkAnswer(this,false)">Bag</button>
+    </div>
+    <a href="quiz3.html" class="quiz-link-btn">Take Quiz 3</a>
+  </div>
+<script>
+  /* ================= USER-BASED PROGRESS ================= */
+function loadUserProgress() {
+  const users = JSON.parse(localStorage.getItem("users")) || {};
+  const currentUser = localStorage.getItem("loggedInUser") || "DemoUser";
+
+  // Initialize user if missing
+  if (!users[currentUser]) users[currentUser] = { progress: {} };
+
+  // Ensure lesson3, quiz3 exist
+  if (users[currentUser].progress.lesson3 === undefined) users[currentUser].progress.lesson3 = false;
+  if (users[currentUser].progress.quiz3 === undefined) users[currentUser].progress.quiz3 = false;
+
+  localStorage.setItem("users", JSON.stringify(users));
+  return { users, currentUser, progress: users[currentUser].progress };
+}
+
+function saveUserProgress(users) {
+  localStorage.setItem("users", JSON.stringify(users));
+}
+
+/* ================= LOAD PROGRESS ================= */
+let { users, currentUser, progress } = loadUserProgress();
+
+/* ================= DOM ELEMENTS ================= */
+const introModal = document.getElementById('introModal');
+const beginBtn = document.getElementById('beginBtn');
+const closeModalBtn = document.getElementById('closeModalBtn');
+const startBtn = document.getElementById('startBtn');
+const nextBtn = document.getElementById('nextBtn');
+const skipBtn = document.getElementById('skipBtn');
+
+const teacherImg = document.getElementById('teacherImg');
+const student1Img = document.getElementById('student1Img');
+
+const teacherBubble = document.getElementById('teacherBubble');
+const studentBubble = document.getElementById('studentBubble');
+const frankieBubble = document.getElementById('frankieBubble');
+const johnBubble = document.getElementById('johnBubble');
+const dbInfo = document.getElementById('dbInfo');
+
+/* ================= STORY SEQUENCE ================= */
+const sequence = [
+  {who:'john', text:'Ugh… Frankie, I keep losing my stuff! My watch, my shirt, my bag… everything! 😫'},
+  {who:'frankie', text:'Calm down, John. Maybe we can organize your items in a simple table. That way, you’ll know where everything is.'},
+  {who:'john', text:'A table? Sounds good, but I don’t even know where to start… 😕'},
+  {who:'frankie', text:'Okay, let’s start small. First, think of each item you want to track as an Entity. What do you want to track?'},
+  {who:'john', text:'Hmm… my Watch, my Shirt, and my Bag. Are these my Entities?'},
+  {who:'frankie', text:'Exactly! Now, for each Entity, we need Attributes—details that describe them. Like Category, Color, Location, and Status.'},
+  {who:'john', text:'Attributes? So, these are the little things that tell me more about my stuff?'},
+  {who:'frankie', text:'Yes! Think of them as characteristics. They help you identify your items at a glance.'},
+  {who:'john', text:'Ah! So my Watch could have Category: Accessory, Color: Black, Location: Desk, Status: Lost. Right?'},
+  {who:'frankie', text:'Perfect! And your Shirt could be Category: Clothing, Color: Blue, Location: Closet, Status: Found.'},
+  {who:'john', text:'I get it now. Each item is an Entity, and each detail about it is an Attribute.'},
+  {who:'frankie', text:'Exactly. And assigning a proper Data Type to each Attribute is important too.'},
+  {who:'john', text:'Data Type? That sounds complicated… 😬'},
+  {who:'frankie', text:'Not really! For example, Category and Color are Text, Status could be Text or Boolean, Location is Text too.'},
+  {who:'john', text:'Ohhh… so I just need to know what kind of information each Attribute stores.'},
+  {who:'frankie', text:'Right! Once you know that, you can organize everything more efficiently.'},
+  {who:'john', text:'This is starting to make sense. I feel like I can finally take control of my stuff.'},
+  {who:'frankie', text:'Good! Now, let’s try another example. Think about your bag. What Attributes would it have?'},
+  {who:'john', text:'Category: Backpack, Color: Red, Location: Bedroom, Status: With me?'},
+  {who:'frankie', text:'Perfect! Notice how each item now has a full set of details you can track.'},
+  {who:'john', text:'I see now why I was always losing things. I never kept track of these details.'},
+  {who:'frankie', text:'Exactly! That’s why databases exist—to keep track of Entities and Attributes in an organized way.'},
+  {who:'john', text:'So this is like making my own personal mini-database? 😄'},
+  {who:'frankie', text:'Yes! And it doesn’t have to be complicated. Even a simple table works.'},
+  {who:'john', text:'Hmm… maybe I should color-code my items too. That will help me find them faster.'},
+  {who:'frankie', text:'Great idea! That’s an Attribute called “Color”. You can also add Date to know when you last used it.'},
+  {who:'john', text:'Ah! So Attributes can be anything that helps me describe or find the item easily.'},
+  {who:'frankie', text:'Exactly. And the more precise you are, the better your tracking will be.'},
+  {who:'john', text:'I feel like a detective now, keeping track of all my clues… I mean, items! 🕵️‍♂️'},
+  {who:'frankie', text:'Haha, yes! Every item is a case, every Attribute is a clue.'},
+  {who:'john', text:'Okay, let me try. My keys… Category: Accessory, Color: Silver, Location: Kitchen, Status: Lost.'},
+  {who:'frankie', text:'Perfect! You’re getting the hang of it.'},
+  {who:'john', text:'Maybe I should make a table for my school supplies too… Notebooks, Pens, Calculator…'},
+  {who:'frankie', text:'Yes! Think of each supply as an Entity, and Attributes could be Subject, Color, Location, Status.'},
+  {who:'john', text:'Wow… this actually makes everything so much easier to manage! 😄'},
+  {who:'frankie', text:'See? Once you understand Entities and Attributes, organizing anything becomes simple.'},
+  {who:'john', text:'Thanks, Frankie! You really saved me from my own forgetfulness! 🙌'},
+  {who:'frankie', text:'Anytime, John. Now you’re ready to start creating your own system for tracking your items.'}
+];
+
+let idx = -1;
+
+/* ================= STORY FUNCTIONS ================= */
+function hideBubbles() {
+  teacherBubble.classList.remove('show');
+  studentBubble.classList.remove('show');
+  frankieBubble.classList.remove('show');
+  johnBubble.classList.remove('show');
+}
+
+function showItem(i) {
+  if (i < 0 || i >= sequence.length) return;
+  const item = sequence[i];
+  hideBubbles();
+
+  setTimeout(() => {
+    if (item.who === 'frankie') {
+      frankieBubble.textContent = "Frankie: " + item.text;
+      frankieBubble.classList.add('show');
+      teacherImg.style.opacity = '1';
+    } else if (item.who === 'john') {
+      johnBubble.textContent = "John: " + item.text;
+      johnBubble.classList.add('show');
+      student1Img.style.opacity = '1';
+      student1Img.style.transform = 'translateY(0)';
+    }
+    nextBtn.disabled = false;
+  }, 180);
+}
+
+function next() {
+  nextBtn.disabled = true;
+  idx++;
+  if (idx < sequence.length) {
+    showItem(idx);
+  } else {
+    dbInfo.style.display = 'block';
+    // MARK LESSON COMPLETE IN USER PROGRESS
+    progress.lesson3 = true;
+    saveUserProgress(users);
+  }
+}
+
+function startScene() {
+  idx = -1;
+  introModal.style.display = 'none';
+  teacherImg.style.opacity = '1';
+  student1Img.style.opacity = '0';
+  student1Img.style.transform = 'translateY(20px)';
+  hideBubbles();
+  nextBtn.disabled = true;
+  setTimeout(() => next(), 300);
+}
+
+/* ================= EVENT LISTENERS ================= */
+beginBtn.addEventListener('click', startScene);
+startBtn.addEventListener('click', startScene);
+nextBtn.addEventListener('click', next);
+closeModalBtn.addEventListener('click', () => introModal.style.display = 'none');
+skipBtn.addEventListener('click', () => {
+  progress.lesson3 = true;
+  progress.quiz3 = true;
+  saveUserProgress(users);
+  window.location.href = 'quiz3.html';
+});
+
+/* ================= MINI QUIZ FUNCTION ================= */
+function checkAnswer(btn, correct) {
+  btn.classList.add(correct ? "correct" : "wrong");
+  btn.parentNode.querySelectorAll("button").forEach(b => b.disabled = true);
+}
+window.checkAnswer = checkAnswer;
+
+/* ================= ON LOAD ================= */
+window.addEventListener("load", () => {
+  let data = loadUserProgress();
+  users = data.users;
+  currentUser = data.currentUser;
+  progress = data.progress;
+  if (progress.lesson3) console.log("Lesson 3 already completed ✅ but still replayable.");
+});
+
+</script>

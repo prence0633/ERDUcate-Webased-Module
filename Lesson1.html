@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title> ERDucate Web Based Module</title>
+<link rel="icon" href="ERDucate.ico">
+<style>
+  :root{
+    --maroon:#800000;
+    --bg:#f9f9f9;
+}
+body{
+    margin:0; 
+    font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+    background: var(--bg); 
+    color:#222;
+}
+
+.page { 
+    max-width: 1000px; 
+    margin: 28px auto; 
+    padding: 0 16px; 
+}
+h1{ 
+    text-align:center; 
+    color:var(--maroon); 
+    margin-bottom:14px; 
+}
+
+.lesson-container {
+    position: relative;
+    width: 100%;
+    height: 520px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #eee;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.12);
+}
+
+.scene-bg {
+    position:absolute; inset:0;
+    background: url("Background1.jpg") center/cover no-repeat;
+    filter: saturate(0.95) contrast(1);
+}
+
+.characters { 
+    position: absolute; 
+    inset:0; 
+    pointer-events:none; 
+}
+
+.teacher {
+    position:absolute;
+    bottom: 20px;
+    left: 22%;
+    width: 160px;
+    z-index: 6;
+    pointer-events:auto;
+    animation: teacherSway 1.8s infinite ease-in-out;
+}
+
+.principal {
+    position:absolute;
+    bottom: 20px;
+    right: 8%;
+    width: 160px;
+    opacity: 1; 
+    transform: translateX(0);
+    transition: transform 0.6s ease, opacity 0.35s ease;
+    z-index: 6;
+    pointer-events:auto;
+}
+
+@keyframes teacherSway {
+    0% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-6px) rotate(-4deg); }
+    100% { transform: translateY(0) rotate(4deg); }
+}
+
+.lightbulb {
+    position: absolute;
+    width: 56px;
+    bottom: 210px;
+    right: 20%;
+    transform: scale(0);
+    z-index: 8;
+    transition: transform 0.35s cubic-bezier(.2,.9,.3,1);
+    filter: drop-shadow(0 6px 8px rgba(0,0,0,0.18));
+}
+.lightbulb.show { transform: scale(1); }
+
+.speech {
+    position: absolute;
+    max-width: 340px;
+    background: #fff;
+    padding: 12px 14px;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+    font-size: 16px;
+    line-height: 1.35;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.36s ease, transform 0.36s ease;
+    z-index: 9;
+}
+.speech.show { opacity: 1; transform: translateY(0); }
+
+.speech.teacher { left: 6%; bottom: 230px; text-align: left; }
+.speech.principal { right: 6%; bottom: 230px; text-align: left; }
+
+.speech::after{
+    content:""; position:absolute; width:0; height:0; border-style:solid;
+}
+.speech.teacher::after{
+    left:18px; bottom:-10px;
+    border-width:10px 10px 0 10px;
+    border-color:#fff transparent transparent transparent;
+}
+.speech.principal::after{
+    right:18px; bottom:-10px;
+    border-width:10px 10px 0 10px;
+    border-color:#fff transparent transparent transparent;
+}
+
+.controls {
+    display:flex; justify-content:center; gap:14px; align-items:center; margin-top:14px;
+}
+.btn {
+    background: var(--maroon); color:#fff; padding:10px 18px; border-radius:8px; border:none;
+    cursor:pointer; font-weight:600; box-shadow: 0 6px 18px rgba(128,0,0,0.12);
+}
+.btn.secondary{ background:#fff; color:var(--maroon); border:2px solid var(--maroon); }
+.btn:active{ transform: translateY(1px); }
+
+.modal {
+    position: fixed; inset:0; display:flex; align-items:center; justify-content:center;
+    background: rgba(0,0,0,0.45); z-index: 9999;
+}
+.modal-card{
+    width: 92%; max-width:640px; background:#fff; border-radius:12px; padding:20px 22px;
+    box-shadow:0 14px 40px rgba(0,0,0,0.25); text-align:left;
+}
+.modal-card h2{ margin-top:0; color:var(--maroon); }
+.modal-card p{ margin:8px 0; line-height:1.45; }
+.modal-actions{ display:flex; justify-content:flex-end; gap:10px; margin-top:12px; }
+
+/* Floating database info popup */
+#dbInfo {
+    display:none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 340px;
+    background: #fff;
+    border: 2px solid var(--maroon);
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    z-index: 9999;
+}
+#dbInfo h3{ margin-top:0; color:var(--maroon); font-size:18px; }
+#dbInfo p{ font-size:14px; line-height:1.4; margin:6px 0; }
+#dbInfo table{ width:100%; border-collapse:collapse; margin:10px 0; font-size:13px; }
+#dbInfo th, #dbInfo td{ border:1px solid #999; padding:6px; text-align:center; }
+
+/* Mini quiz */
+.mini-quiz{ margin-top:12px; }
+.mini-quiz button{ display:block; width:100%; margin:4px 0; padding:8px; border-radius:6px; border:1px solid var(--maroon); background:#fff; cursor:pointer; }
+.mini-quiz button.correct{ background:#d4edda; border-color:#28a745; }
+.mini-quiz button.wrong{ background:#f8d7da; border-color:#dc3545; }
+
+/* RESPONSIVE DESIGN */
+
+/* For screens up to 1024px (tablet landscape) */
+@media (max-width: 1024px){
+    .lesson-container{ height: 480px; }
+    .teacher, .principal{ width: 140px; }
+    .speech{ max-width: 300px; font-size: 15px; }
+    .page{ padding: 0 12px; }
+}
+
+/* For screens up to 768px (tablet portrait) */
+@media (max-width: 768px){
+    .lesson-container{ height: 460px; }
+    .teacher, .principal{ width: 120px; }
+    .speech{ max-width: 260px; font-size: 15px; bottom: 200px; }
+    .lightbulb{ bottom: 170px; }
+    #dbInfo{ width: 280px; font-size: 13px; }
+    .page{ padding: 0 10px; }
+}
+
+/* For screens up to 480px (mobile) */
+@media (max-width: 480px){
+    .lesson-container{ height: 420px; }
+    .teacher, .principal{ width: 100px; }
+    .speech{ font-size: 14px; bottom: 180px; max-width: 220px; }
+    .lightbulb{ bottom: 160px; width: 44px; }
+    #dbInfo{ width: 240px; font-size: 12px; }
+    h1{ font-size: 20px; }
+    .btn{ padding: 8px 14px; font-size: 14px; }
+}
+
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>Lesson 1 — Introduction to Databases & Importance of Structuring: The Attendance Problem</h1>
+
+  <div class="modal-card" style="margin-bottom:18px;">
+    <h2>Lesson 1 Objectives</h2>
+    <ul>
+      <li>Define what a <strong>Database</strong> is</li>
+      <li>Explain the idea of <strong>Structured Data</strong> with examples</li>
+      <li>Recognize the <strong>importance of structuring</strong> data in school record-keeping</li>
+    </ul>
+  </div>
+
+  <div class="lesson-container">
+    <div class="scene-bg"></div>
+    <div class="characters">
+      <img src="TeacherLesson1.png" alt="Confused teacher" class="teacher" id="teacherImg">
+      <img src="Lightbulb.png" alt="Lightbulb idea" class="lightbulb" id="lightbulb">
+      <img src="Principal.jpg" alt="Principal" class="principal" id="principalImg">
+    </div>
+
+    <div class="speech teacher" id="teacherBubble"></div>
+    <div class="speech principal" id="principalBubble"></div>
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="startBtn">Start Scene</button>
+    <button class="btn secondary" id="nextBtn" disabled>Next</button>
+    <button class="btn secondary" id="skipBtn">Skip to Content</button>
+  </div>
+</div>
+
+<div class="modal" id="introModal">
+  <div class="modal-card">
+    <h2>Intro — Story Outline</h2>
+    <p>In a school, a teacher struggles with checking the students' attendance. Sometimes the list goes missing, and sometimes there are too many entries. The principal often scolds the teacher because the records are messy.</p>
+    <p>In this short story, we’ll see how the principal himself came up with a better way to manage data — which they called a <strong>DATABASE</strong>.</p>
+    <div class="modal-actions">
+      <button class="btn secondary" id="closeModalBtn">Read Later</button>
+      <button class="btn" id="beginBtn">Start Story</button>
+    </div>
+  </div>
+</div>
+
+<div id="dbInfo">
+  <h3>Database & Structured Data Summary</h3>
+  <p><strong>Database:</strong> A central place to store information, making it easy to organize, manage, and retrieve data efficiently.</p>
+  <p><strong>Structured Data:</strong> Data organized in a clear and consistent format to avoid confusion, improve accuracy, and simplify access.</p>
+  <p>This ensures that information is reliable, complete, and easy to find.</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Date</th>
+        <th>Attendance</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Dado Suarez</td><td>June 11</td><td>Present</td></tr>
+      <tr><td>Maria Santos</td><td>June 11</td><td>Absent</td></tr>
+      <tr><td>Pedro Reyes</td><td>June 11</td><td>Present</td></tr>
+    </tbody>
+  </table>
+
+  <div class="mini-quiz">
+    <p><strong>Check Yourself:</strong> What are the advantages of structured data?</p>
+    <button onclick="checkAnswer(this,true)">Easy to find and update.</button>
+    <button onclick="checkAnswer(this,false)">More disorganized and easy to lose.</button>
+    <button onclick="checkAnswer(this,false)">It will result in more paper loss.</button>
+  </div>
+
+  <button class="btn" id="quizBtn" style="width:100%; margin-top:10px;">Proceed to Quiz 1</button>
+</div>
+
+<script>
+  // ==== Helpers for user progress (centralized with users[currentUser]) ====
+  function loadProgress(){
+    try {
+      const users = JSON.parse(localStorage.getItem("users")) || {};
+      const currentUser = localStorage.getItem("loggedInUser");
+      if(!currentUser || !users[currentUser]){
+        console.warn("No current user found.");
+        return {};
+      }
+      return users[currentUser].progress || {};
+    }catch(e){
+      console.warn("Corrupted user data, resetting...", e);
+      return {};
+    }
+  }
+
+  function saveProgress(obj){
+    try {
+      const users = JSON.parse(localStorage.getItem("users")) || {};
+      const currentUser = localStorage.getItem("loggedInUser");
+      if(!currentUser || !users[currentUser]) return;
+      users[currentUser].progress = obj;
+      localStorage.setItem("users", JSON.stringify(users));
+    }catch(e){
+      console.warn("Failed to save progress:", e);
+    }
+  }
+
+  let progress = loadProgress();
+
+  const introModal = document.getElementById('introModal');
+  const beginBtn = document.getElementById('beginBtn');
+  const closeModalBtn = document.getElementById('closeModalBtn');
+  const startBtn = document.getElementById('startBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const skipBtn = document.getElementById('skipBtn');
+
+  const teacherImg = document.getElementById('teacherImg');
+  const principalImg = document.getElementById('principalImg');
+  const lightbulb = document.getElementById('lightbulb');
+  const teacherBubble = document.getElementById('teacherBubble');
+  const principalBubble = document.getElementById('principalBubble');
+
+  const dbInfo = document.getElementById('dbInfo');
+  const quizBtn = document.getElementById('quizBtn');
+
+  const sequence = [
+    { who: 'teacher', text: "Hmm… where are the students' attendance records again?" },
+    { who: 'teacher', text: "I keep getting scolded over and over…" },
+    { who: 'principal', text: "Teacher! Why are the attendance records always wrong?", action: 'principalEnter' },
+    { who: 'teacher', text: "I'm sorry, sometimes the paper gets lost, sometimes there are extra names…" },
+    { who: 'principal', text: "That's not acceptable! It's messing up the school records." },
+    { who: 'teacher', text: "I'm doing my best, sir…" },
+    { who: 'principal', text: "But it's not enough! What if this happens with the grades? The whole school will be in chaos." },
+    { who: 'teacher', text: "It's really embarrassing, and it's been hard for me too." },
+    { who: 'principal', text: "If we keep having problems with paperwork…", action: 'thinking' },
+    { who: 'principal', text: "We need a system that can organize all the data.", action: 'showLightbulb' },
+    { who: 'teacher', text: "A system that organizes all the data?" },
+    { who: 'principal', text: "Yes. We'll call it… a DATABASE." },
+    { who: 'teacher', text: "Database? What is that, sir?" },
+    { who: 'principal', text: "A database is like a cabinet of information — everything is organized, easy to find, and doesn’t get lost easily." },
+    { who: 'teacher', text: "Oh! That means no more lost records and it’ll be easier to check!" },
+    { who: 'principal', text: "Exactly. Also, in a database, the data is structured so everything stays organized." },
+    { who: 'teacher', text: "Structured? What does that mean?" },
+    { who: 'principal', text: "It means there’s a clear arrangement — like a table: one column for Name, another for Date, and one for Attendance." },
+    { who: 'teacher', text: "Ahh, like a list that’s not just mixed up, but with proper places for each piece of info!" },
+    { who: 'principal', text: "Precisely. So if I want to check Juan’s attendance on September 1, just one click — it shows up immediately." },
+    { who: 'teacher', text: "Wow, sir. No more digging through piles of paper." },
+    { who: 'principal', text: "Right, and it’s not just for attendance. Grades, schedules, even the school’s inventory can be recorded in the database." },
+    { who: 'teacher', text: "So that means faster work and fewer mistakes?" },
+    { who: 'principal', text: "Exactly. Because the data is structured and digital, it’s easier to update, share, and secure." },
+    { who: 'teacher', text: "Sir, it feels like a thorn has been pulled out! It’s really hard when everything’s on paper." },
+    { who: 'principal', text: "That’s why starting today, we’ll begin planning. We’ll teach all the teachers how to use the database." },
+    { who: 'teacher', text: "That’s exciting! The school will be more organized, and our work will be much lighter." },
+    { who: 'principal', text: "That’s what I want to hear. Remember, teacher: when the data is organized, the whole system is organized." }
+  ];
+
+  let idx = -1;
+  function hideBubbles(){
+    teacherBubble.classList.remove('show');
+    principalBubble.classList.remove('show');
+  }
+
+  function showItem(i){
+    if(i<0 || i>=sequence.length) return;
+    const item = sequence[i];
+    hideBubbles();
+    if(item.action==='principalEnter'){
+      principalImg.style.transform='translateX(0)';
+      principalImg.style.opacity='1';
+    }
+    if(item.action==='showLightbulb'){
+      lightbulb.classList.add('show');
+    }
+    setTimeout(()=>{
+      if(item.who==='teacher'){
+        teacherBubble.textContent=item.text;
+        teacherBubble.classList.add('show');
+      }else{
+        principalBubble.textContent=item.text;
+        principalBubble.classList.add('show');
+      }
+      nextBtn.disabled=false;
+    },180);
+  }
+
+  function next(){
+    nextBtn.disabled=true;
+    idx++;
+    if(idx<sequence.length){
+      showItem(idx);
+    }else{
+      dbInfo.style.display='block';
+      progress.lesson1 = true;
+      saveProgress(progress);
+    }
+  }
+
+  function startScene(){
+    idx=-1;
+    introModal.style.display='none';
+    principalImg.style.transform='translateX(40px)';
+    principalImg.style.opacity='0';
+    lightbulb.classList.remove('show');
+    teacherBubble.textContent='';
+    principalBubble.textContent='';
+    hideBubbles();
+    nextBtn.disabled=true;
+    setTimeout(()=>next(),300);
+  }
+
+  beginBtn.addEventListener('click', startScene);
+  startBtn.addEventListener('click', startScene);
+  nextBtn.addEventListener('click', next);
+  closeModalBtn.addEventListener('click', ()=>introModal.style.display='none');
+
+  skipBtn.addEventListener('click', ()=>{
+    progress.lesson1=true;
+    progress.quiz1=true;
+    saveProgress(progress);
+    try{ window.location.href='quiz1.html'; }catch(e){ console.warn("Redirect failed:", e); }
+  });
+
+  quizBtn.addEventListener('click', ()=>{
+    progress.quiz1=true;
+    saveProgress(progress);
+    try{ window.location.href='quiz1.html'; }catch(e){ console.warn("Redirect failed:", e); }
+  });
+
+  function checkAnswer(btn,correct){
+    if(correct){ btn.classList.add("correct"); }
+    else{ btn.classList.add("wrong"); }
+    const siblings=btn.parentNode.querySelectorAll("button");
+    siblings.forEach(b=>b.disabled=true);
+  }
+  window.checkAnswer = checkAnswer;
+
+  window.addEventListener("load",()=>{
+    progress = loadProgress();
+    if(progress.lesson1) console.log("Lesson 1 already completed ✅ but still replayable.");
+  });
+</script>

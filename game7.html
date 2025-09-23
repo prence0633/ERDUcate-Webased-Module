@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ERDucate Lesson 7 - Normalization & Database Design Challenge</title>
+<link rel="icon" href="ERDucate.ico">
+<style>
+body {
+    font-family: 'Poppins', sans-serif;
+    background: url('Background-game-Lesson1.png') no-repeat center center fixed;
+    background-size: cover;
+    color: #333;
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 20px;
+    transition: background-image 0.5s ease-in-out;
+}
+
+body::before { 
+    content: ""; 
+    position: fixed; 
+    inset:0; 
+    background: rgba(255,255,255,0.6); 
+    z-index: -1; 
+}
+
+header { 
+    background:#800000; 
+    color:#fff; 
+    padding:12px 18px; 
+    display:flex; 
+    justify-content:space-between; 
+    align-items:center; 
+    border-radius:8px; 
+}
+
+header .title{ font-size:18px; font-weight:600; }
+header .btn-group button, header .btn-group a { 
+    border:2px solid #fff; 
+    background:transparent; 
+    color:#fff; 
+    padding:6px 12px; 
+    border-radius:6px; 
+    text-decoration:none; 
+    margin-left:8px; 
+    font-size:13px; 
+    cursor:pointer; 
+}
+
+header .btn-group button:hover, header .btn-group a:hover { 
+    background:#fff; 
+    color:#800000; 
+}
+
+h1{ 
+    text-align:center; 
+    color:#800000; 
+    margin:18px 0; 
+    font-size:20px; 
+}
+
+.cta-btn { 
+    display:inline-block; 
+    background:#800000; 
+    color:#fff; 
+    padding:10px 18px; 
+    border-radius:10px; 
+    font-weight:600; 
+    font-size:15px; 
+    text-decoration:none; 
+    box-shadow:0 4px 12px rgba(0,0,0,0.15); 
+    margin-top:10px; 
+    cursor:pointer; 
+}
+
+.cta-btn:hover { 
+    background:#a00000; 
+    transform: scale(1.05); 
+}
+
+#gameWrapper { 
+    display:flex; 
+    flex-direction:column; 
+    align-items:center; 
+    gap:20px; 
+    margin-top:40px; 
+    flex-wrap:wrap; 
+}
+
+.column { 
+    display:flex; 
+    gap:15px; 
+    flex-wrap:wrap; 
+    justify-content:center; 
+}
+
+.box { 
+    padding:16px; 
+    border:2px dashed #800000; 
+    border-radius:10px; 
+    min-width:100px; 
+    min-height:120px; 
+    text-align:center; 
+    font-weight:600; 
+    background:#fff; 
+    transition: all 0.2s; 
+}
+
+.box.highlight { border-color:#28a745; }
+
+.item { 
+    padding:8px 12px; 
+    border-radius:8px; 
+    border:2px solid #800000; 
+    background:#fff; 
+    cursor:pointer; 
+    text-align:center; 
+    font-weight:600; 
+    transition:0.2s; 
+}
+
+.item.dragging { opacity:0.5; }
+.item.correct { background:#28a745; color:#fff; border-color:#28a745; }
+.item.wrong { background:#ff4c4c; color:#fff; border-color:#ff4c4c; }
+.item.selected { border-color:#28a745; background:#e0ffe0; }
+
+#congratsMessage { 
+    text-align:center; 
+    font-size:28px; 
+    font-weight:bold; 
+    color:#28a745; 
+    margin-top:40px; 
+    display:none; 
+}
+
+.modal-bg { 
+    position:fixed; 
+    inset:0; 
+    background:rgba(0,0,0,0.6); 
+    display:flex; 
+    align-items:center; 
+    justify-content:center; 
+    opacity:1; 
+    transition:opacity 0.3s ease; 
+}
+
+.modal-bg.hidden { 
+    opacity:0; 
+    pointer-events:none; 
+}
+
+.modal { 
+    background:white; 
+    padding:20px 28px; 
+    border-radius:10px; 
+    max-width:500px; 
+    text-align:center; 
+    box-shadow:0 8px 24px rgba(0,0,0,0.2); 
+}
+
+.modal h2 { margin-bottom:12px; color:#800000; }
+@media (max-width: 1024px) {
+  #gameWrapper { gap: 20px; }
+  .box { min-width: 100px; min-height: 120px; padding: 16px; }
+  .item { padding: 8px 12px; font-size: 0.9rem; }
+  h1 { font-size: 1.25rem; }
+  .cta-btn { font-size: 1rem; padding: 10px 18px; }
+}
+
+@media (max-width: 768px) {
+  #gameWrapper { flex-direction: column; gap: 20px; }
+  .column { gap: 10px; }
+  .box { min-width: 90px; min-height: 110px; padding: 12px; font-size: 0.85rem; flex: 1; }
+  .item { padding: 6px 10px; font-size: 0.85rem; }
+  h1 { font-size: 1.125rem; }
+  .cta-btn { font-size: 0.95rem; padding: 8px 16px; width: 100%; }
+}
+
+@media (max-width: 480px) {
+  .box { min-width: 70px; min-height: 90px; padding: 10px; font-size: 0.8rem; }
+  .item { padding: 5px 8px; font-size: 0.8rem; }
+  h1 { font-size: 1rem; }
+  .cta-btn { font-size: 0.9rem; padding: 6px 12px; width: 100%; max-width: 280px; margin: 0 auto; }
+}
+
+
+</style>
+</head>
+<body>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<audio id="successSound" src="ClappLesson1.mp3"></audio>
+<audio id="bgMusic" src="BackgroundLesson1.mp3" loop></audio>
+
+<header>
+  <div class="title">Lesson 7 — Normalization & Database Design Challenge</div>
+  <div class="btn-group">
+    <button id="musicBtn" onclick="toggleMusic(this)">🔊 Mute</button>
+    <a href="quiz7.html">📋 Back to Quiz</a>
+    <a href="index.html">🏠 Home</a>
+  </div>
+</header>
+
+<div id="introModal" class="modal-bg">
+  <div class="modal">
+    <h2>Normalization Challenge Instructions 🎯</h2>
+    <p>Welcome to ERDucate!<br>
+    Help John organize his messy tables into proper Normal Forms:<br>
+    1st Normal Form, 2nd Normal Form, 3rd Normal Form.<br>
+    Drag or tap each table attribute to the correct Normal Form box.<br>
+    Correctly placed items turn green, wrong placements flash red.<br>
+    Complete all attributes in 10 rounds to finish the challenge!</p>
+    <button class="cta-btn" onclick="startRound()">Start Round 1</button>
+  </div>
+</div>
+
+<h1 id="roundTitle">Round 1 — Normalization Challenge</h1>
+<div id="gameWrapper">
+  <div class="column" id="itemsColumn"></div>
+  <div class="column" id="boxesColumn"></div>
+</div>
+
+<div id="congratsMessage">🎉 Correct! You completed this round! 🎉</div>
+
+<script>
+let draggedItem = null;
+let selectedItem = null; // for mobile tap
+let currentRound = 0;
+let lives = 3;
+
+// Game rounds data
+const rounds = [
+  ["CustomerID,Name,Orders","OrderID,Product,Price","CustomerName,OrderDate"],
+  ["EmployeeID,Name,Dept,DeptLocation","ProjectID,EmployeeID,Hours","EmployeeName,ProjectName"],
+  ["StudentID,Name,Course,Instructor","CourseID,Credits,Department","StudentName,Grade"],
+  ["BookID,Title,Author,Publisher","BorrowerID,BookID,DateBorrowed","BorrowerName,BookTitle"],
+  ["ProductID,Name,Category,Price","SupplierID,ProductID,Stock","ProductName,Quantity"],
+  ["PatientID,Name,Diagnosis,Treatment","DoctorID,PatientID,VisitDate","PatientName,Medication"],
+  ["OrderID,CustomerID,ItemID,Quantity","InvoiceID,OrderID,Total","CustomerName,ItemName"],
+  ["CourseID,StudentID,Score,Grade","AssignmentID,CourseID,Points","StudentName,AssignmentTitle"],
+  ["TicketID,EventID,Seat,Price","AttendeeID,TicketID,CheckInTime","AttendeeName,EventName"],
+  ["RegistrationID,StudentID,CourseID,Status","PaymentID,RegistrationID,Amount","StudentName,CourseName"]
+];
+
+const boxes = ["1st Normal Form","2nd Normal Form","3rd Normal Form"];
+const correctMaps = [
+  { "CustomerID,Name,Orders":"1st Normal Form", "OrderID,Product,Price":"2nd Normal Form", "CustomerName,OrderDate":"3rd Normal Form" },
+  { "EmployeeID,Name,Dept,DeptLocation":"1st Normal Form", "ProjectID,EmployeeID,Hours":"2nd Normal Form", "EmployeeName,ProjectName":"3rd Normal Form" },
+  { "StudentID,Name,Course,Instructor":"1st Normal Form", "CourseID,Credits,Department":"2nd Normal Form", "StudentName,Grade":"3rd Normal Form" },
+  { "BookID,Title,Author,Publisher":"1st Normal Form", "BorrowerID,BookID,DateBorrowed":"2nd Normal Form", "BorrowerName,BookTitle":"3rd Normal Form" },
+  { "ProductID,Name,Category,Price":"1st Normal Form", "SupplierID,ProductID,Stock":"2nd Normal Form", "ProductName,Quantity":"3rd Normal Form" },
+  { "PatientID,Name,Diagnosis,Treatment":"1st Normal Form", "DoctorID,PatientID,VisitDate":"2nd Normal Form", "PatientName,Medication":"3rd Normal Form" },
+  { "OrderID,CustomerID,ItemID,Quantity":"1st Normal Form", "InvoiceID,OrderID,Total":"2nd Normal Form", "CustomerName,ItemName":"3rd Normal Form" },
+  { "CourseID,StudentID,Score,Grade":"1st Normal Form", "AssignmentID,CourseID,Points":"2nd Normal Form", "StudentName,AssignmentTitle":"3rd Normal Form" },
+  { "TicketID,EventID,Seat,Price":"1st Normal Form", "AttendeeID,TicketID,CheckInTime":"2nd Normal Form", "AttendeeName,EventName":"3rd Normal Form" },
+  { "RegistrationID,StudentID,CourseID,Status":"1st Normal Form", "PaymentID,RegistrationID,Amount":"2nd Normal Form", "StudentName,CourseName":"3rd Normal Form" }
+];
+
+function toggleMusic(btn){
+  const bgMusic = document.getElementById('bgMusic');
+  if(bgMusic.paused){ bgMusic.play(); btn.textContent="🔊 Mute"; }
+  else { bgMusic.pause(); btn.textContent="🔇 Unmute"; }
+}
+
+// Start the game
+function startRound(){
+  document.getElementById('introModal').classList.add('hidden');
+  lives = 3; 
+  updateHearts();
+  renderGame(currentRound);
+}
+
+// Update hearts
+function updateHearts(){
+  let heartHtml = '';
+  for(let i=0;i<lives;i++) heartHtml += '❤️ ';
+  document.getElementById('roundTitle').innerHTML = `Round ${currentRound+1} — Normalization Challenge <br>${heartHtml}`;
+}
+
+// Render game
+function renderGame(roundIndex){
+  const itemsCol = document.getElementById("itemsColumn");
+  const boxesCol = document.getElementById("boxesColumn");
+  itemsCol.innerHTML = ""; boxesCol.innerHTML = "";
+
+  const items = rounds[roundIndex];
+  const correctMap = correctMaps[roundIndex];
+
+  // Items
+  items.forEach(i=>{
+    const div = document.createElement("div");
+    div.textContent = i;
+    div.className = "item";
+    div.draggable = true;
+
+    // Desktop drag
+    div.addEventListener("dragstart", e=>{ draggedItem = div; setTimeout(()=>div.classList.add("dragging"),0); });
+    div.addEventListener("dragend", e=>{ div.classList.remove("dragging"); });
+
+    // Mobile click select
+    div.addEventListener("click", e=>{
+      if(div.classList.contains("correct")) return;
+      if(selectedItem) selectedItem.classList.remove("selected");
+      selectedItem = div;
+      div.classList.add("selected");
+    });
+
+    itemsCol.appendChild(div);
+  });
+
+  // Boxes
+  boxes.forEach(b=>{
+    const div = document.createElement("div");
+    div.textContent = b;
+    div.className = "box";
+
+    // Drop for drag-and-drop
+    div.addEventListener("dragover", e=> e.preventDefault());
+    div.addEventListener("dragenter", e=> e.preventDefault());
+    div.addEventListener("drop", e=>{
+      if(!draggedItem) return;
+      placeItem(draggedItem, b, correctMap);
+      draggedItem = null;
+    });
+
+    // Click-to-place for mobile
+    div.addEventListener("click", e=>{
+      if(!selectedItem) return;
+      placeItem(selectedItem, b, correctMap);
+      selectedItem.classList.remove("selected");
+      selectedItem = null;
+    });
+
+    boxesCol.appendChild(div);
+  });
+
+  document.getElementById('congratsMessage').style.display = "none";
+}
+
+// Place item
+function placeItem(item, boxName, correctMap){
+  if(correctMap[item.textContent] === boxName){
+    item.classList.add("correct");
+    item.draggable = false;
+
+    // Append to correct box
+    const boxesElems = document.getElementsByClassName("box");
+    for(let box of boxesElems){
+      if(box.textContent === boxName){
+        box.appendChild(item);
+        break;
+      }
+    }
+
+    checkCompletion();
+  } else {
+    item.classList.add("wrong");
+    lives--;
+    updateHearts();
+    if(lives <= 0){ gameOver(); return; }
+    setTimeout(()=>{ item.classList.remove("wrong"); }, 800);
+  }
+}
+
+// Check completion
+function checkCompletion(){
+  const allCorrect = Array.from(document.getElementsByClassName("item")).every(i=>i.classList.contains("correct"));
+  if(allCorrect){
+    const successSound = document.getElementById('successSound');
+    if(successSound){ successSound.currentTime=0; successSound.volume=0.8; successSound.play(); }
+    confetti({ particleCount:150, spread:70, origin:{y:0.6} });
+    document.getElementById('congratsMessage').style.display = "block";
+
+    // SAVE PROGRESS for Game 7
+    const users = JSON.parse(localStorage.getItem("users"));
+    const currentUser = localStorage.getItem("loggedInUser");
+    if(users && currentUser){
+        if(!users[currentUser].progress) users[currentUser].progress = {};
+        users[currentUser].progress["game7"] = true;
+        localStorage.setItem("users", JSON.stringify(users));
+    }
+
+    // Next round
+    currentRound++;
+    if(currentRound < rounds.length){
+      setTimeout(()=>{ 
+        updateHearts();
+        document.getElementById('roundTitle').textContent = `Round ${currentRound+1} — Normalization Challenge`;
+        renderGame(currentRound);
+      }, 1500);
+    } else {
+      document.getElementById('congratsMessage').innerHTML = "🎉 Congratulations! You completed all 10 rounds! 🎉<br><br><a href='progress.html' class='cta-btn'>📊 View Progress / Certificate</a>";
+      document.getElementById("itemsColumn").innerHTML = "";
+      document.getElementById("boxesColumn").innerHTML = "";
+      document.getElementById("roundTitle").textContent = "";
+    }
+  }
+}
+
+// Game over
+function gameOver(){
+  document.getElementById('congratsMessage').innerHTML = "💔 Game Over! You ran out of lives.<br><br><a href='lesson7.html' class='cta-btn'>Try Again</a>";
+  document.getElementById('congratsMessage').style.display = "block";
+  document.getElementById("itemsColumn").innerHTML = "";
+  document.getElementById("boxesColumn").innerHTML = "";
+  document.getElementById("roundTitle").textContent = "";
+}
+</script>

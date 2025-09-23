@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>ERDucate Web Module — Lesson 8</title>
+<link rel="icon" href="ERDucate.ico">
+<style>
+:root{
+  --maroon:#800000;
+  --bg:#f9f9f9;
+}
+body{
+  margin:0;
+  font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+  background: var(--bg);
+  color:#222;
+}
+.page { max-width:1000px; margin:28px auto; padding:0 16px; }
+h1{text-align:center; color:var(--maroon); margin-bottom:14px; }
+
+/* Lesson Scene */
+.lesson-container {
+  position: relative;
+  width: 100%;
+  min-height: 520px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #eee;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.12);
+}
+.scene-bg {
+  position:absolute; inset:0;
+  background: url("Background-computerlab.jpg") center/cover no-repeat;
+  filter: brightness(0.92) saturate(1.05) contrast(1.1);
+}
+
+/* Characters */
+.characters { position:absolute; inset:0; pointer-events:none; }
+.student {
+  position:absolute; bottom: 20px; width:120px; z-index:5; opacity:0;
+  transform: translateY(20px); transition: transform 0.6s ease, opacity 0.35s ease;
+}
+.student1 { left: 25%; }
+.student2 { left: 50%; transform: translateX(-50%) translateY(20px); }
+.student3 { left: 75%; transform: translateX(-50%) translateY(20px); }
+
+/* Speech bubbles */
+.speech {
+  position:absolute;
+  max-width:250px;
+  background:#fff;
+  padding:10px 14px;
+  border-radius:12px;
+  box-shadow:0 6px 20px rgba(0,0,0,0.12);
+  font-size:16px;
+  line-height:1.35;
+  opacity:0;
+  transform: translateY(8px);
+  transition: opacity 0.36s ease, transform 0.36s ease;
+  z-index:9;
+}
+.speech.show { opacity:1; transform:translateY(0); }
+
+/* Position bubbles above characters */
+.speech.student1-bubble { bottom:180px; left:22%; text-align:left; }
+.speech.student1-bubble::after{
+  content:""; position:absolute; border:10px solid transparent;
+  border-right-color:#fff; left:-20px; top:12px;
+}
+.speech.student2-bubble { bottom:180px; left:50%; transform:translateX(-50%); text-align:center; }
+.speech.student2-bubble::after{
+  content:""; position:absolute; border:10px solid transparent;
+  border-bottom-color:#fff; top:-20px; left:50%; transform:translateX(-50%);
+}
+.speech.student3-bubble { bottom:180px; left:75%; text-align:right; }
+.speech.student3-bubble::after{
+  content:""; position:absolute; border:10px solid transparent;
+  border-left-color:#fff; right:-20px; top:12px;
+}
+
+/* Controls */
+.controls {
+  display:flex; justify-content:center; gap:14px; align-items:center; margin-top:14px;
+}
+.btn {
+  background: var(--maroon); color:#fff; padding:10px 18px; border-radius:8px; border:none;
+  cursor:pointer; font-weight:600; box-shadow: 0 6px 18px rgba(128,0,0,0.12);
+}
+.btn.secondary{ background:#fff; color:var(--maroon); border:2px solid var(--maroon); }
+.btn:active{ transform: translateY(1px); }
+
+/* Modal */
+.modal {
+  position: fixed; inset:0; display:flex; align-items:center; justify-content:center;
+  background: rgba(0,0,0,0.45); z-index: 9999;
+}
+.modal-card{
+  width: 92%; max-width:640px; background:#fff; border-radius:12px; padding:20px 22px;
+  box-shadow:0 14px 40px rgba(0,0,0,0.25); text-align:left;
+}
+.modal-card h2{ margin-top:0; color:var(--maroon); }
+.modal-card p{ margin:8px 0; line-height:1.45; }
+.modal-actions{ display:flex; justify-content:flex-end; gap:10px; margin-top:12px; }
+
+/* DB Info */
+#dbInfo {
+  display:none;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 360px;
+  background: #fff;
+  border: 2px solid var(--maroon);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  z-index: 9999;
+}
+#dbInfo h3{ margin-top:0; color:var(--maroon); font-size:18px; }
+#dbInfo p{ font-size:14px; line-height:1.4; margin:6px 0; }
+#dbInfo table{ width:100%; border-collapse:collapse; margin:10px 0; font-size:13px; }
+#dbInfo th, #dbInfo td{ border:1px solid #999; padding:6px; text-align:center; }
+.quiz-link-btn{
+  display:block; margin-top:10px; text-align:center; padding:10px; background:var(--maroon);
+  color:#fff; border-radius:8px; text-decoration:none; font-weight:600;
+}
+
+/* Responsive Additions */
+/* For tablets and small laptops (1024px and below) */
+@media (max-width: 1024px) {
+  .page { max-width: 90%; }
+  .student { width: 110px; }
+  .speech { max-width: 220px; font-size:15px; }
+  .lesson-container { min-height: 480px; }
+  #dbInfo { width: 300px; }
+}
+
+/* For tablets (768px and below) */
+@media (max-width: 768px) {
+  .student { width: 90px; }
+  .speech { max-width: 200px; font-size:14px; }
+  .lesson-container { min-height: 450px; }
+  .speech.student1-bubble { left: 18%; bottom:160px; }
+  .speech.student2-bubble { bottom:160px; }
+  .speech.student3-bubble { left:72%; bottom:160px; }
+  #dbInfo { width: 260px; font-size:13px; }
+}
+
+/* For mobile phones (480px and below) */
+@media (max-width:480px){
+  .lesson-container{ min-height:420px; }
+  .student{ width:80px; }
+  .speech{ font-size:13px; bottom:140px; max-width:90%; }
+  .speech.student1-bubble { left:10%; bottom:130px; }
+  .speech.student2-bubble { bottom:130px; }
+  .speech.student3-bubble { left:68%; bottom:130px; }
+  #dbInfo{ width:220px; font-size:12px; }
+}
+
+</style>
+</head>
+<body>
+<div class="page">
+<h1>Lesson 8 — Introduction to SQL & Querying Databases</h1>
+
+<!-- Lesson Objectives -->
+<div class="modal-card" style="margin-bottom:18px;">
+  <h2>Lesson 8 Objectives</h2>
+  <p>At the end of the lesson, the student should be able to:</p>
+  <ul>
+    <li>Explain the purpose of SQL in database querying</li>
+    <li>Use basic SQL commands: SELECT, FROM, WHERE</li>
+    <li>Retrieve data efficiently from tables</li>
+    <li>Apply SQL queries to solve simple data problems</li>
+  </ul>
+</div>
+
+<!-- Story Scene -->
+<div class="lesson-container">
+  <div class="scene-bg"></div>
+  <div class="characters">
+    <img src="studentfrankie.jpg" alt="Frankie" class="student student1" id="student1Img">
+    <img src="sTUDENT-jOHN.jpg" alt="John" class="student student2" id="student2Img">
+    <img src="Student-Mia.png" alt="Mia" class="student student3" id="student3Img">
+  </div>
+  <!-- Bubbles -->
+  <div class="speech student1-bubble" id="student1Bubble"></div>
+  <div class="speech student2-bubble" id="student2Bubble"></div>
+  <div class="speech student3-bubble" id="student3Bubble"></div>
+</div>
+
+<!-- Controls -->
+<div class="controls">
+  <button class="btn" id="startBtn">Start Lesson</button>
+  <button class="btn secondary" id="nextBtn" disabled>Next</button>
+  <button class="btn secondary" id="skipBtn">Skip to Quiz</button>
+</div>
+</div>
+
+<!-- Intro Modal -->
+<div class="modal" id="introModal">
+  <div class="modal-card">
+    <h2>Intro — Lesson Overview</h2>
+    <p>
+      Frankie introduces SQL to help John retrieve data quickly. Mia observes. 
+      They explore SELECT, FROM, WHERE to solve small tasks and find lost items.
+    </p>
+    <div class="modal-actions">
+      <button class="btn secondary" id="closeModalBtn">Read Later</button>
+      <button class="btn" id="beginBtn">Start Lesson</button>
+    </div>
+  </div>
+</div>
+
+<!-- Floating database info -->
+<div id="dbInfo">
+  <h3>Summary — SQL & Querying Databases</h3>
+  <p><strong>SELECT:</strong> Retrieves data from columns</p>
+  <p><strong>FROM:</strong> Table to query</p>
+  <p><strong>WHERE:</strong> Filter rows by conditions</p>
+  <table>
+    <thead>
+      <tr><th>ItemID</th><th>Item</th><th>Status</th><th>Owner</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>201</td><td>Watch</td><td>Lost</td><td>John</td></tr>
+      <tr><td>202</td><td>Notebook</td><td>Found</td><td>Mia</td></tr>
+      <tr><td>203</td><td>Pencil</td><td>Lost</td><td>Frankie</td></tr>
+    </tbody>
+  </table>
+  <p>Example SQL: <code>SELECT Item FROM LostAndFound WHERE Status='Lost';</code></p>
+  <a href="quiz8.html" class="quiz-link-btn">Take Quiz 8</a>
+</div>
+
+<script>
+  // ===============================
+  // User progress
+  // ===============================
+  function loadUserProgress(){
+    let users = JSON.parse(localStorage.getItem("users")) || {};
+    let currentUser = localStorage.getItem("loggedInUser") || "guest";
+    users[currentUser] = users[currentUser] || {progress:{}};
+    return {users, currentUser};
+  }
+  function saveUserProgress(users){
+    localStorage.setItem("users", JSON.stringify(users));
+  }
+
+  // ===============================
+  // DOM elements
+  // ===============================
+  const introModal = document.getElementById('introModal');
+  const beginBtn = document.getElementById('beginBtn');
+  const closeModalBtn = document.getElementById('closeModalBtn');
+  const startBtn = document.getElementById('startBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const skipBtn = document.getElementById('skipBtn');
+
+  const student1Img = document.getElementById('student1Img');
+  const student2Img = document.getElementById('student2Img');
+  const student3Img = document.getElementById('student3Img');
+
+  const student1Bubble = document.getElementById('student1Bubble');
+  const student2Bubble = document.getElementById('student2Bubble');
+  const student3Bubble = document.getElementById('student3Bubble');
+
+  const dbInfo = document.getElementById('dbInfo');
+
+  // ===============================
+  // Dialogue sequence
+  // ===============================
+  const sequence = [
+    
+  {who:'student2', text:'Ugh… how do I even talk to this machine?! I’m lost 😅'},
+  {who:'student1', text:'Relax, John. That’s why SQL exists — it’s our “language” for talking to the database.'},
+  {who:'student3', text:'Think of it like a magnifying glass for data — you can find anything quickly.'},
+  {who:'student2', text:'So I don’t have to beg the computer nicely? 😂'},
+  {who:'student1', text:'Exactly! Let’s start with the basics: SELECT.'},
+  {who:'student1', text:'SELECT tells the database what information you want to see.'},
+  {who:'student1', text:'FROM tells it which table to look in.'},
+  {who:'student1', text:'And WHERE lets you filter results so you get only what you need.'},
+  {who:'student2', text:'Hmm… can I try finding my lost watch now?'},
+  {who:'student1', text:'Sure! Try this: SELECT Item FROM LostAndFound WHERE Status="Lost";'},
+  {who:'student2', text:'No way… it worked! I found my watch! 😁'},
+  {who:'student3', text:'Nice! Now try checking who owns the doodled notebook.'},
+  {who:'student2', text:'SELECT Owner FROM LostAndFound WHERE Item="Notebook";'},
+  {who:'student1', text:'Exactly! You’re officially an SQL detective now.'},
+  {who:'student2', text:'Even Mia’s “lost crush”? Haha, just joking 😂'},
+  {who:'student3', text:'Hehe, focus on the database, detective. 😉'},
+  {who:'student1', text:'Remember, John: SELECT + FROM + WHERE is the foundation.'},
+  {who:'student1', text:'Master this, and you can query almost anything.'},
+  {who:'student2', text:'What if I want all the items that are already claimed?'},
+  {who:'student1', text:'Simple: SELECT Item FROM LostAndFound WHERE Status="Claimed";'},
+  {who:'student2', text:'Ohhh… that shows what’s no longer available.'},
+  {who:'student3', text:'See? You can narrow data down in seconds.'},
+  {who:'student2', text:'This is so much easier than I thought!'},
+  {who:'student1', text:'Try another: SELECT * FROM LostAndFound;'},
+  {who:'student2', text:'Whoa… it shows everything in the table.'},
+  {who:'student3', text:'That’s the power of SELECT with an asterisk.'},
+  {who:'student2', text:'But isn’t that too much information sometimes?'},
+  {who:'student1', text:'Yes, that’s why WHERE is important — it keeps things clean.'},
+  {who:'student2', text:'Got it. Filter only what I need, don’t drown in data.'},
+  {who:'student3', text:'Look at you… from lost-and-found boy to SQL detective. 🔍'},
+  {who:'student2', text:'Haha, I should get a badge for this.'},
+  {who:'student1', text:'Badge unlocked: Basic Query Master! 🏅'},
+  {who:'student2', text:'Yesss! I’ll add that to my resume 😂'},
+  {who:'student3', text:'Teacher will be impressed with how functional our database is.'},
+  {who:'student1', text:'And clean queries mean faster results — always remember that.'},
+  {who:'student2', text:'So it’s not just about getting data, but also doing it efficiently.'},
+  {who:'student3', text:'Exactly. Efficiency is what separates beginners from pros.'},
+  {who:'student1', text:'Keep practicing SELECT, FROM, and WHERE — they’re the pillars of SQL.'},
+  {who:'student2', text:'Thanks, detectives. I can finally handle data like a pro! 🎉'}
+];
+
+
+  let idx = -1;
+
+  function hideBubbles(){
+    student1Bubble.classList.remove('show');
+    student2Bubble.classList.remove('show');
+    student3Bubble.classList.remove('show');
+  }
+
+  function showItem(i){
+    if(i<0 || i>=sequence.length) return;
+    const item = sequence[i];
+    hideBubbles();
+    setTimeout(()=>{
+      if(item.who==='student1'){
+        student1Bubble.textContent = item.text;
+        student1Bubble.classList.add('show');
+      } else if(item.who==='student2'){
+        student2Bubble.textContent = item.text;
+        student2Bubble.classList.add('show');
+      } else if(item.who==='student3'){
+        student3Bubble.textContent = item.text;
+        student3Bubble.classList.add('show');
+      }
+      nextBtn.disabled=false;
+    },100);
+  }
+
+  function markLessonComplete(){
+    let {users, currentUser} = loadUserProgress();
+    users[currentUser].progress.lesson8 = true;
+    saveUserProgress(users);
+  }
+
+  function next(){
+    nextBtn.disabled=true;
+    idx++;
+    if(idx<sequence.length){
+      showItem(idx);
+    } else {
+      dbInfo.style.display='block';
+      markLessonComplete();
+    }
+  }
+
+  function startScene(){
+    idx=-1;
+    introModal.style.display='none';
+    [student1Img,student2Img,student3Img].forEach(s=>s.style.opacity='1');
+    hideBubbles();
+    nextBtn.disabled=true;
+    setTimeout(()=>next(),300);
+  }
+
+  // ===============================
+  // Event listeners
+  // ===============================
+  beginBtn.addEventListener('click', startScene);
+  startBtn.addEventListener('click', startScene);
+  nextBtn.addEventListener('click', next);
+  closeModalBtn.addEventListener('click', ()=>introModal.style.display='none');
+  skipBtn.addEventListener('click', ()=>{
+    let {users,currentUser}=loadUserProgress();
+    users[currentUser].progress.lesson8=true;
+    users[currentUser].progress.quiz8=true;
+    saveUserProgress(users);
+    window.location.href='quiz8.html';
+  });
+
+  window.addEventListener('load', ()=>{
+    let {users,currentUser}=loadUserProgress();
+    if(users[currentUser].progress.lesson8) console.log("Lesson 8 already completed ✅ but still replayable.");
+  });
+</script>
+</body>
+</html>
+
+
+
+

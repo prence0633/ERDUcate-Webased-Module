@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ERDucate Web Based Module — Lesson 5</title>
+  <link rel="icon" href="ERDucate.ico">
+</head>
+<style>
+  :root{
+    --maroon:#800000;
+    --bg:#f9f9f9;
+}
+body{
+    margin:0;
+    font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+    background: var(--bg);
+    color:#222;
+}
+.page { 
+    max-width: 1000px; 
+    margin: 28px auto; 
+    padding: 0 16px; 
+}
+h1{ 
+    text-align:center; 
+    color:var(--maroon); 
+    margin-bottom:14px; 
+}
+
+.lesson-container {
+    position: relative;
+    width: 100%;
+    height: 520px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #eee;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.12);
+}
+.scene-bg {
+    position:absolute; 
+    inset:0;
+    background: url("Background-Library.jpg") center/cover no-repeat;
+    filter: brightness(0.92) saturate(1.05) contrast(1.1);
+}
+.characters { position: absolute; inset:0; pointer-events:none; }
+.teacher {
+    position:absolute;
+    bottom: 20px;
+    left: 10%;
+    width: 160px;
+    z-index: 6;
+    pointer-events:auto;
+    animation: teacherSway 1.8s infinite ease-in-out;
+}
+.student {
+    position:absolute;
+    bottom: 20px;
+    width: 120px;
+    z-index: 5;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: transform 0.6s ease, opacity 0.35s ease;
+}
+.student1 { left: 35%; } /* Frankie */
+.student2 { left: 55%; } /* John */
+.student3 { left: 75%; } /* Mia */
+
+@keyframes teacherSway {
+    0% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-6px) rotate(-3deg); }
+    100% { transform: translateY(0) rotate(3deg); }
+}
+
+.speech {
+    position: absolute;
+    max-width: 340px;
+    background: #fff;
+    padding: 12px 14px;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+    font-size: 16px;
+    line-height: 1.35;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.36s ease, transform 0.36s ease;
+    z-index: 9;
+}
+.speech.show { opacity: 1; transform: translateY(0); }
+.speech.teacher { left: 6%; bottom: 230px; text-align: left; }
+.speech.student { right: 6%; bottom: 230px; text-align: left; }
+
+.speech::after{
+    content:""; position:absolute; width:0; height:0; border-style:solid;
+}
+.speech.teacher::after{
+    left:18px; bottom:-10px;
+    border-width:10px 10px 0 10px;
+    border-color:#fff transparent transparent transparent;
+}
+.speech.student::after{
+    right:18px; bottom:-10px;
+    border-width:10px 10px 0 10px;
+    border-color:#fff transparent transparent transparent;
+}
+
+.controls {
+    display:flex; 
+    justify-content:center; 
+    gap:14px; 
+    align-items:center; 
+    margin-top:14px;
+}
+.btn {
+    background: var(--maroon); 
+    color:#fff; 
+    padding:10px 18px; 
+    border-radius:8px; 
+    border:none;
+    cursor:pointer; 
+    font-weight:600; 
+    box-shadow: 0 6px 18px rgba(128,0,0,0.12);
+}
+.btn.secondary{ 
+    background:#fff; 
+    color:var(--maroon); 
+    border:2px solid var(--maroon); 
+}
+.btn:active{ transform: translateY(1px); }
+
+.modal {
+    position: fixed; 
+    inset:0; 
+    display:flex; 
+    align-items:center; 
+    justify-content:center;
+    background: rgba(0,0,0,0.45); 
+    z-index: 9999;
+}
+.modal-card{
+    width: 92%; 
+    max-width:640px; 
+    background:#fff; 
+    border-radius:12px; 
+    padding:20px 22px;
+    box-shadow:0 14px 40px rgba(0,0,0,0.25); 
+    text-align:left;
+}
+.modal-card h2{ margin-top:0; color:var(--maroon); }
+.modal-card p{ margin:8px 0; line-height:1.45; }
+.modal-actions{ display:flex; justify-content:flex-end; gap:10px; margin-top:12px; }
+
+#dbInfo {
+    display:none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 360px;
+    background: #fff;
+    border: 2px solid var(--maroon);
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    z-index: 9999;
+}
+#dbInfo h3{ margin-top:0; color:var(--maroon); font-size:18px; }
+#dbInfo p{ font-size:14px; line-height:1.4; margin:6px 0; }
+#dbInfo table{ width:100%; border-collapse:collapse; margin:10px 0; font-size:13px; }
+#dbInfo th, #dbInfo td{ border:1px solid #999; padding:6px; text-align:center; }
+
+.quiz-link-btn{
+    display:block; 
+    margin-top:10px; 
+    text-align:center; 
+    padding:10px; 
+    background:var(--maroon);
+    color:#fff; 
+    border-radius:8px; 
+    text-decoration:none; 
+    font-weight:600;
+}
+
+/* ---------------------- */
+/* RESPONSIVENESS SECTION */
+/* ---------------------- */
+
+/* For tablets and small laptops - 1024px and below */
+@media (max-width:1024px){
+    .lesson-container{ height: 480px; }
+    .teacher{ width:140px; left:8%; }
+    .student{ width:110px; }
+    .speech{ max-width:300px; font-size:15px; }
+    #dbInfo{ width:300px; }
+}
+
+/* For tablets - 768px and below */
+@media (max-width:768px){
+    .lesson-container{ height: 460px; }
+    .teacher{ width:120px; left:6%; }
+    .student{ width:95px; }
+    .speech{ max-width:260px; font-size:15px; bottom:200px; }
+    #dbInfo{ width:260px; font-size:13px; }
+}
+
+/* For small mobile devices - 480px and below */
+@media (max-width:480px){
+    .lesson-container{ height:420px; }
+    .teacher{ width:100px; left:5%; }
+    .student{ width:80px; }
+    .speech{ font-size:14px; bottom:180px; max-width:220px; }
+    #dbInfo{ width:220px; font-size:12px; }
+    .quiz-link-btn{ font-size:14px; padding:8px; }
+}
+
+</style>
+
+<body>
+  <div class="page">
+    <h1>Lesson 5 — Table Relationships</h1>
+
+    <!-- Lesson Objectives -->
+    <div class="modal-card" style="margin-bottom:18px;">
+      <h2>Lesson 5 Objectives</h2>
+      <p>At the end of the lesson, the student should be able to:</p>
+      <ul>
+        <li>Explain the concept of One-to-One, One-to-Many, and Many-to-Many relationships</li>
+        <li>Identify examples of table relationships in real-life scenarios</li>
+        <li>Understand how relationships connect different tables</li>
+        <li>Apply relationships to organize information efficiently</li>
+      </ul>
+    </div>
+
+    <!-- Story Scene -->
+    <div class="lesson-container">
+      <div class="scene-bg"></div>
+      <div class="characters">
+        <img src="studentfrankie.jpg" alt="Frankie" class="student student1" id="student1Img">
+        <img src="sTUDENT-jOHN.jpg" alt="John" class="student student2" id="student2Img">
+        <img src="Student-Mia.png" alt="Mia" class="student student3" id="student3Img">
+      </div>
+      <div class="speech teacher" id="teacherBubble"></div>
+      <div class="speech student" id="studentBubble"></div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <button class="btn" id="startBtn">Start Lesson</button>
+      <button class="btn secondary" id="nextBtn" disabled>Next</button>
+      <button class="btn secondary" id="skipBtn">Skip to Quiz</button>
+    </div>
+  </div>
+
+  <!-- Intro Modal -->
+  <div class="modal" id="introModal">
+    <div class="modal-card">
+      <h2>Intro — Story Outline</h2>
+      <p>
+        Today, John investigates his lost items and finds that they are connected to other students. 
+        Frankie introduces <strong>Table Relationships</strong> as a cleaner way to track connections:
+        <ul>
+          <li>One-to-One → Student ↔ ID card</li>
+          <li>One-to-Many → Student ↔ Attendance records</li>
+          <li>Many-to-Many → Students ↔ Clubs</li>
+        </ul>
+        Mia adds humor and insight while helping them understand relationships. 
+        John realizes that relationships connect clues, making the data meaningful.
+      </p>
+      <div class="modal-actions">
+        <button class="btn secondary" id="closeModalBtn">Read Later</button>
+        <button class="btn" id="beginBtn">Start Story</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating database info popup -->
+  <div id="dbInfo">
+    <h3>Summary — Table Relationships</h3>
+    <p><strong>One-to-One:</strong> Each row in Table A matches exactly one row in Table B (e.g., Student ↔ ID Card).</p>
+    <p><strong>One-to-Many:</strong> One row in Table A relates to multiple rows in Table B (e.g., Student ↔ Attendance records).</p>
+    <p><strong>Many-to-Many:</strong> Multiple rows in Table A relate to multiple rows in Table B (e.g., Students ↔ Clubs).</p>
+    <table>
+      <thead>
+        <tr><th>StudentID</th><th>Name</th><th>Club</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>101</td><td>John</td><td>Chess Club</td></tr>
+        <tr><td>102</td><td>Frankie</td><td>Math Club</td></tr>
+        <tr><td>103</td><td>Mia</td><td>Art Club</td></tr>
+      </tbody>
+    </table>
+    <p>Relationships help us link data efficiently, making information meaningful.</p>
+    <a href="quiz5.html" class="quiz-link-btn">Take Quiz 5</a>
+  </div>
+
+  <script>
+  // Progress storage
+  function loadUserProgress(){
+    let users = JSON.parse(localStorage.getItem("users")) || {};
+    let currentUser = localStorage.getItem("loggedInUser") || "guest";
+    users[currentUser] = users[currentUser] || { progress:{} };
+    return { users, currentUser };
+  }
+
+  function saveUserProgress(users){
+    localStorage.setItem("users", JSON.stringify(users));
+  }
+
+  // DOM elements
+  const introModal = document.getElementById('introModal');
+  const beginBtn = document.getElementById('beginBtn');
+  const closeModalBtn = document.getElementById('closeModalBtn');
+  const startBtn = document.getElementById('startBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const skipBtn = document.getElementById('skipBtn');
+
+  const student1Img = document.getElementById('student1Img'); // Frankie
+  const student2Img = document.getElementById('student2Img'); // John
+  const student3Img = document.getElementById('student3Img'); // Mia
+
+  // Create bubbles for each student
+  const student1Bubble = document.createElement('div');
+  const student2Bubble = document.createElement('div');
+  const student3Bubble = document.createElement('div');
+
+  student1Bubble.className = 'speech student';
+  student2Bubble.className = 'speech student';
+  student3Bubble.className = 'speech student';
+
+  // Position bubbles
+  student1Bubble.style.bottom = '230px';
+  student1Bubble.style.left = '30%';
+  student2Bubble.style.bottom = '230px';
+  student2Bubble.style.left = '50%';
+  student3Bubble.style.bottom = '230px';
+  student3Bubble.style.left = '70%';
+
+  document.querySelector('.lesson-container').appendChild(student1Bubble);
+  document.querySelector('.lesson-container').appendChild(student2Bubble);
+  document.querySelector('.lesson-container').appendChild(student3Bubble);
+
+  const dbInfo = document.getElementById('dbInfo');
+
+  // Dialogue sequence
+ const sequence = [
+  {who:'student2', text:'Frankie! My Watch is still missing, but how can I figure out who took it from the table?'},
+  {who:'student1', text:'Relax, John. Remember our tables? We need to connect them using Relationships so everything becomes clear.'},
+  {who:'student2', text:'But Frankie, there are so many attributes, I might get confused tracking them.'},
+  {who:'student1', text:'You’re not alone! Step by step. First, the One-to-One relationship.'},
+  {who:'student1', text:'Think of it like Student → ID Card. Each student has only one card, no duplicates.'},
+  {who:'student2', text:'Ahhh, so each item has a unique identifier. Got it!'},
+  {who:'student1', text:'Exactly. Next, One-to-Many. For example, Student → Attendance records.'},
+  {who:'student2', text:'Ooooh! Like each class session, there’s a record of who attended. Just like clues on a case board.'},
+  {who:'student1', text:'Exactly. And Many-to-Many, where many students can join multiple clubs.'},
+  {who:'student2', text:'Ahhh, so each student can have many connections to other tables, like a network of clues.'},
+  {who:'student1', text:'Now, let’s visualize it on your “evidence board.” Arrows, branching, intersections… all relationships are displayed.'},
+  {who:'student2', text:'Okay, Frankie. So each item, each attribute, will have an arrow connecting it to related data.'},
+  {who:'student1', text:'Yes! One-to-One, simple arrow. One-to-Many, branching arrows. Many-to-Many, multiple intersections.'},
+  {who:'student2', text:'Whoa… it’s like a puzzle you need to solve to see all connections.'},
+  {who:'student1', text:'That’s the point of relationships. Without them, data is just random pieces, no story.'},
+  {who:'student2', text:'Ahhh, I get it! Without relationships, I wouldn’t know which item is connected to my Watch.'},
+  {who:'student3', text:'Haha! John, you really have a detective aura now in the library.'},
+  {who:'student2', text:'Hehe, yes! But something’s missing… I still can’t find some of my items, they’re gone.'},
+  {who:'student1', text:'Hmm… maybe we need more clues. Check all tables: Student → Items, Student → Clubs, Student → Attendance…'},
+  {who:'student2', text:'Good idea. Let’s scan each connection to find the missing pieces.'},
+  {who:'student1', text:'Ah, I see it. Your Watch is linked to the attribute “Owner = John,” but it’s missing from the table.'},
+  {who:'student2', text:'Yes! Exactly. But why isn’t it on my physical desk?'},
+  {who:'student1', text:'Hmm… strange… no other clues match either.'},
+  {who:'student2', text:'Seems like someone is hiding a clue… but who could it be? 😳'},
+  {who:'student3', text:'Hehe… interesting investigation, huh? 😏'},
+  {who:'student2', text:'Mia? What is that? Do you know where it is?'},
+  {who:'student1', text:'Wait, her hint seems to link to another table, but not directly… tricky.'},
+  {who:'student2', text:'Okay… step by step. Let’s trace all connections, like puzzle-solving mode.'},
+  {who:'student1', text:'Exactly. Every relationship may reveal a hidden path.'},
+  {who:'student2', text:'Aha! There’s a pattern… but seems like there’s a missing piece in the logic… 😮'},
+  {who:'student1', text:'John, looks like someone intentionally adjusted the data. Look at the owner attribute… shifted to another table.'},
+  {who:'student2', text:'What?! So someone really manipulated the tables? 😳'},
+  {who:'student3', text:'Uhh… hehehe… 🤭'},
+  {who:'student2', text:'Mia! Do you know where my Watch is?! 😡'},
+  {who:'student3', text:'Okay, okay… fine 😅. Actually… I was the one who hid your Watch.'},
+  {who:'student2', text:'WHAT?! 😮 Why did you do that, Mia?!'},
+  {who:'student3', text:'Well… I just wanted to see how you would investigate… and… because I like you, John 😳'},
+  {who:'student2', text:'😳 Hahaha… so the mystery is solved, and there’s a secret reveal too!'},
+  {who:'student1', text:'Lesson 5: Relationships aren’t just about data. There’s a human factor… and sometimes feelings involved 😄'},
+  {who:'student2', text:'Hahaha… okay fine. Watch retrieved, mystery solved, and… crush acknowledged 😆'},
+  {who:'student3', text:'Congrats, John! Detective skills leveled up, and there’s a new connection at the end 😏'},
+  {who:'student1', text:'Exactly. Once you know how to relate data, the story becomes clearer, and sometimes life has surprises 😄'},
+  {who:'student2', text:'At least, the “mystery” of my Watch and its attributes is solved… and my heart too 😅'},
+  {who:'student3', text:'Hahaha! Mission accomplished, detectives! 😎'},
+  {who:'student1', text:'Lesson 5 complete. Relationships understood, mystery solved, teamwork achieved, and a happy ending!'}
+];
+  let idx = -1;
+
+  // Helper functions
+  function hideBubbles(){
+    student1Bubble.classList.remove('show');
+    student2Bubble.classList.remove('show');
+    student3Bubble.classList.remove('show');
+  }
+
+  function showItem(i){
+    if(i < 0 || i >= sequence.length) return;
+    const item = sequence[i];
+    hideBubbles();
+
+    setTimeout(()=>{
+      if(item.who==='student1'){
+        student1Bubble.textContent = "Frankie: " + item.text;
+        student1Bubble.classList.add('show');
+        student1Img.style.opacity='1';
+        student1Img.style.transform='translateY(0)';
+      } else if(item.who==='student2'){
+        student2Bubble.textContent = "John: " + item.text;
+        student2Bubble.classList.add('show');
+        student2Img.style.opacity='1';
+        student2Img.style.transform='translateY(0)';
+      } else if(item.who==='student3'){
+        student3Bubble.textContent = "Mia: " + item.text;
+        student3Bubble.classList.add('show');
+        student3Img.style.opacity='1';
+        student3Img.style.transform='translateY(0)';
+      }
+      nextBtn.disabled = false;
+    },180);
+  }
+
+  function markLessonComplete(){
+    let {users, currentUser} = loadUserProgress();
+    users[currentUser].progress.lesson5 = true;
+    saveUserProgress(users);
+    console.log("Lesson 5 marked complete ✅ for monitor");
+  }
+
+  // Navigation functions
+  function next(){
+    nextBtn.disabled = true;
+    idx++;
+    if(idx < sequence.length){
+      showItem(idx);
+    } else {
+      dbInfo.style.display = 'block';
+      markLessonComplete();
+    }
+  }
+
+  function startScene(){
+    idx = -1;
+    introModal.style.display='none';
+    student1Img.style.opacity='0';
+    student2Img.style.opacity='0';
+    student3Img.style.opacity='0';
+    student1Bubble.textContent='';
+    student2Bubble.textContent='';
+    student3Bubble.textContent='';
+    hideBubbles();
+    nextBtn.disabled=true;
+    setTimeout(()=>{ next(); },300);
+  }
+
+  // Event listeners
+  beginBtn.addEventListener('click', startScene);
+  startBtn.addEventListener('click', startScene);
+  nextBtn.addEventListener('click', next);
+  closeModalBtn.addEventListener('click', ()=> introModal.style.display='none');
+
+  skipBtn.addEventListener('click', ()=>{
+    let {users, currentUser} = loadUserProgress();
+    users[currentUser].progress.lesson5 = true;
+    users[currentUser].progress.quiz5 = true;
+    saveUserProgress(users);
+    window.location.href='quiz5.html';
+  });
+
+  // On page load
+  window.addEventListener("load", ()=>{
+    let {users, currentUser} = loadUserProgress();
+    if(users[currentUser].progress.lesson5){
+      console.log("Lesson 5 already completed ✅ but still replayable.");
+    }
+  });
+</script>

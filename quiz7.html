@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ERDucate Quiz 7 - Normalization Steps</title>
+<link rel="icon" href="ERDucate.ico">
+<style>
+  body {
+    font-family: 'Poppins', sans-serif;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 20px;
+    background-image: url("Quiz-Background-Lesson7.png");
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-attachment: fixed;
+    background-size: cover;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    position: relative;
+}
+header {
+    background-color: #800000;
+    color: #fff;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+header .title { font-size: 20px; font-weight: 600; }
+header .btn-group a {
+    background: transparent;
+    border: 2px solid #fff;
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 14px;
+    transition: 0.3s ease;
+}
+header .btn-group a:hover { background: #fff; color: #800000; }
+h1 {
+    color: #800000;
+    text-align: center;
+    margin-top: 25px;
+}
+form { margin-top: 20px; }
+.question {
+    background: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+.question h3 { margin: 0 0 10px; color: #800000; }
+.question label { display: block; margin: 6px 0; }
+button.submit-btn {
+    padding: 12px 20px;
+    background: #800000;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    display: block;
+    margin: 15px auto 15px auto;
+    transition: 0.3s ease;
+}
+footer {
+    text-align: center;
+    background: #800000;
+    color: #fff;
+    padding: 25px;
+    font-size: 13px;
+}
+.timer {
+    font-weight: bold;
+    font-size: 16px;
+    text-align: center;
+    margin-top: 10px;
+}
+#resultModal {
+    position: fixed;
+    top:0; left:0;
+    width:100vw; height:100vh;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 9999;
+}
+.modal-content {
+    background: #fff;
+    border-radius: 12px;
+    max-width: 600px;
+    width: 100%;
+    padding: 20px 25px;
+    text-align: left;
+    position: relative;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+.modal-content h2 { color: #800000; margin-top:0; }
+.modal-content ul { padding-left:20px; margin:15px 0; }
+.modal-content button {
+    margin-top: 15px;
+    padding: 10px 18px;
+    border:none;
+    border-radius:8px;
+    font-weight:600;
+    background:#800000;
+    color:#fff;
+    cursor:pointer;
+    position: relative;
+}
+.modal-content button:hover { background:#a00000; }
+.close-btn {
+    position: absolute;
+    top:10px; right:15px;
+    background:transparent;
+    border:none;
+    font-size:22px;
+    cursor:pointer;
+    color:#666;
+}
+.close-btn:hover { color:#000; }
+#proceedBtn { opacity:0.5; pointer-events:none; }
+#proceedBtn.enabled { opacity:1; pointer-events:auto; }
+
+/* ========================= */
+/* RESPONSIVE BREAKPOINTS    */
+/* ========================= */
+
+/* Large tablets / small laptops */
+@media (max-width: 1024px) {
+    body { max-width: 95%; }
+    header { padding: 12px 15px; }
+    header .title { font-size: 19px; }
+    h1 { font-size: 22px; }
+    .question { padding: 14px; }
+    .question h3 { font-size: 16px; }
+}
+
+/* Tablets */
+@media (max-width: 768px) {
+    body { padding: 0 15px; }
+    header { flex-direction: column; align-items: flex-start; gap: 10px; }
+    header .title { font-size: 18px; }
+    header .btn-group a { font-size: 13px; padding: 5px 12px; }
+    h1 { font-size: 20px; }
+    .question { padding: 12px; }
+    .question h3 { font-size: 15px; }
+    .question label { font-size: 13px; }
+    button.submit-btn { font-size: 15px; width: 100%; }
+    .modal-content { max-width: 90%; padding: 18px; }
+    .modal-content h2 { font-size: 18px; }
+    .modal-content ul { font-size: 14px; }
+}
+
+/* Phones */
+@media (max-width: 480px) {
+    body { padding: 0 10px; }
+    header { flex-direction: column; align-items: center; text-align: center; gap: 8px; }
+    header .title { font-size: 17px; }
+    header .btn-group a { font-size: 12px; padding: 4px 10px; }
+    h1 { font-size: 18px; margin-top: 15px; }
+    .question { padding: 10px; border-radius: 8px; }
+    .question h3 { font-size: 14px; }
+    .question label { font-size: 12px; }
+    button.submit-btn { font-size: 14px; padding: 10px; }
+    .timer { font-size: 14px; }
+    .modal-content { padding: 15px; }
+    .modal-content h2 { font-size: 16px; }
+    .modal-content button { font-size: 14px; width: 100%; }
+    footer { padding: 15px; font-size: 12px; }
+}
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="title">Quiz 7 - Normalization Steps</div>
+  <div class="btn-group">
+    <a href="Lesson7.html">📚 Back to Lesson</a>
+    <a href="index.html">🏠 Home</a>
+  </div>
+</header>
+
+<h1>Quiz - Situational: Arrange the Steps of Normalization</h1>
+<div class="timer">Time left: <span id="time">120</span>s</div>
+
+<form id="quizForm"></form>
+
+<button id="submitQuiz" class="submit-btn">Submit</button>
+
+<script>
+const form = document.getElementById("quizForm");
+const submitBtn = document.getElementById("submitQuiz");
+
+// Questions: Order-the-Steps (1NF → 2NF → 3NF)
+const questions = [
+  "Step 1: Which step removes repeating groups and ensures each column holds atomic values?",
+  "Step 2: Which step removes partial dependencies; non-key attributes depend on the full primary key?",
+  "Step 3: Which step removes transitive dependencies; non-key attributes depend only on primary keys?",
+  "In our lesson scenario, John sorted each piece of data into its proper place. Which Normal Form is this?",
+  "Frankie taught them to separate columns that depend only on part of a key. Which Normal Form is applied?",
+  "Mia explained that non-key attributes should not depend on other non-key attributes. Which Normal Form is this?",
+  "Breaking large messy tables into smaller organized ones is an example of which Normal Form first applied?",
+  "Ensuring relationships are logical and reducing indirect dependencies corresponds to which step?",
+  "Organizing data so each clue goes into its proper folder aligns with which Normal Form?",
+  "The final clean ERD, free from transitive dependencies, represents completion of which Normal Form?"
+];
+
+const answers = {
+  q1:"a", q2:"b", q3:"c", q4:"a", q5:"b", q6:"c", q7:"a", q8:"c", q9:"a", q10:"c"
+};
+
+const rationalizations = {
+  q1:"✅ 1NF: Removes repeating groups; atomic values for each column.",
+  q2:"✅ 2NF: Removes partial dependencies; non-key attributes depend on full primary key.",
+  q3:"✅ 3NF: Removes transitive dependencies; attributes depend only on primary keys.",
+  q4:"✅ 1NF: John sorted data into proper places, applying 1NF.",
+  q5:"✅ 2NF: Separating columns that depend only on part of a key is 2NF.",
+  q6:"✅ 3NF: Non-key attributes not depending on other non-key attributes is 3NF.",
+  q7:"✅ 1NF: Breaking big tables into smaller organized ones is first step 1NF.",
+  q8:"✅ 3NF: Reducing indirect dependencies aligns with 3NF.",
+  q9:"✅ 1NF: Organizing each clue into its proper folder demonstrates 1NF.",
+  q10:"✅ 3NF: Final clean ERD with no transitive dependencies represents 3NF."
+};
+
+// Generate questions
+questions.forEach((text,i)=>{
+  const div = document.createElement("div");
+  div.className="question";
+  const qNum=i+1;
+  div.innerHTML=`<h3>${qNum}. ${text}</h3>
+    <label><input type="radio" name="q${qNum}" value="a"> 1st Normal Form (1NF)</label>
+    <label><input type="radio" name="q${qNum}" value="b"> 2nd Normal Form (2NF)</label>
+    <label><input type="radio" name="q${qNum}" value="c"> 3rd Normal Form (3NF)</label>`;
+  form.appendChild(div);
+});
+
+// Modal
+const modal = document.createElement("div");
+modal.id="resultModal";
+modal.innerHTML=`<div class="modal-content">
+  <button class="close-btn">&times;</button>
+  <h2>Quiz Results & Rationalization</h2>
+  <p id="scoreText"></p>
+  <ul id="rationalizationList"></ul>
+  <button id="proceedBtn">Proceed to Game 7</button>
+</div>`;
+document.body.appendChild(modal);
+
+const timerEl = document.getElementById("time");
+let timeLeft=120;
+timerEl.textContent=timeLeft;
+const timer = setInterval(()=>{
+  timeLeft--; timerEl.textContent=timeLeft;
+  if(timeLeft<=0){ clearInterval(timer); submitBtn.click(); }
+},1000);
+
+const closeBtn = modal.querySelector(".close-btn");
+const scoreText = modal.querySelector("#scoreText");
+const rationalizationList = modal.querySelector("#rationalizationList");
+const proceedBtn = modal.querySelector("#proceedBtn");
+
+let users = JSON.parse(localStorage.getItem("users"))||{};
+let currentUser = localStorage.getItem("loggedInUser")||"DemoUser";
+if(!users[currentUser]) users[currentUser]={progress:{}};
+
+proceedBtn.addEventListener("mouseenter", ()=>{
+  if(!users[currentUser].progress.quiz7) {
+    const x=Math.random()*150; const y=Math.random()*50;
+    proceedBtn.style.transform=`translate(${x}px, ${y}px)`;
+  }
+});
+proceedBtn.addEventListener("mouseleave", ()=>{ proceedBtn.style.transform=`translate(0,0)` });
+
+submitBtn.addEventListener("click", ()=>{
+  clearInterval(timer);
+  let score=0;
+  rationalizationList.innerHTML="";
+  for(let i=1;i<=10;i++){
+    let selected=(form["q"+i]&&form["q"+i].value)||"";
+    const li=document.createElement("li");
+    if(selected===answers["q"+i]){
+      score++; li.textContent=rationalizations["q"+i];
+    } else {
+      li.textContent="❌ Incorrect. "+rationalizations["q"+i].slice(2);
+    }
+    rationalizationList.appendChild(li);
+  }
+  scoreText.textContent=`You scored ${score} out of 10.`;
+  if(score>=7){
+    users[currentUser].progress.quiz7=true;
+    localStorage.setItem("users",JSON.stringify(users));
+    proceedBtn.classList.add("enabled");
+    proceedBtn.textContent="🎮 Proceed to Game";
+  } else {
+    proceedBtn.classList.remove("enabled");
+    proceedBtn.textContent="Score too low. Try again!";
+  }
+  modal.style.display="flex";
+});
+
+closeBtn.addEventListener("click",()=>{ modal.style.display="none"; });
+proceedBtn.addEventListener("click",()=>{ if(users[currentUser].progress.quiz7) location.href="game7.html"; });
+</script>
+
+<footer>
+  ERDucate Developer © 2025 | Technological University of the Philippines
+</footer>
+
+</body>
+</html>

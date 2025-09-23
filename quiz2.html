@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ERDucate Lesson1-Basic Concepts of Database Structure</title>
+  <link rel="icon" href="ERDucate.ico">
+  <style>
+   body {
+  font-family: 'Poppins', sans-serif;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 20px;
+  background-image: url("Quiz-Background-Lesson2.png");
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-attachment: fixed;
+  background-size: cover;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+header {
+  background-color: #800000;
+  color: #fff;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+header .title { font-size: 20px; font-weight: 600; }
+header .btn-group a {
+  background: transparent;
+  border: 2px solid #fff;
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 14px;
+  transition: 0.3s ease;
+}
+header .btn-group a:hover {
+  background: #fff;
+  color: #800000;
+}
+h1 {
+  color: #800000;
+  text-align: center;
+  margin-top: 25px;
+}
+form { margin-top: 20px; }
+.question {
+  background: #fff;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+.question h3 { margin: 0 0 10px; color: #800000; }
+.question label { display: block; margin: 6px 0; }
+button.submit-btn {
+  padding: 12px 20px;
+  background: #800000;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s ease;
+}
+footer {
+  text-align: center;
+  background: #800000;
+  color: #fff;
+  padding: 25px;
+  font-size: 13px;
+}
+.timer {
+  font-weight: bold;
+  font-size: 16px;
+  text-align: center;
+  margin-top: 10px;
+}
+
+/* Modal Styles */
+#resultModal {
+  position: fixed;
+  top:0; left:0;
+  width:100vw; height:100vh;
+  background: rgba(0,0,0,0.6);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 9999;
+}
+.modal-content {
+  background: #fff;
+  border-radius: 12px;
+  max-width: 600px;
+  width: 100%;
+  padding: 20px 25px;
+  text-align: left;
+  position: relative;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+.modal-content h2 { color: #800000; margin-top:0; }
+.modal-content ul { padding-left:20px; margin:15px 0; }
+.modal-content button {
+  margin-top: 15px;
+  padding: 10px 18px;
+  border:none;
+  border-radius:8px;
+  font-weight:600;
+  background:#800000;
+  color:#fff;
+  cursor:pointer;
+}
+.modal-content button:hover { background:#a00000; }
+.close-btn {
+  position: absolute;
+  top:10px; right:15px;
+  background:transparent;
+  border:none;
+  font-size:22px;
+  cursor:pointer;
+  color:#666;
+}
+.close-btn:hover { color:#000; }
+#proceedBtn { opacity:0.5; pointer-events:none; }
+#proceedBtn.enabled { opacity:1; pointer-events:auto; }
+
+/* 🔽 RESPONSIVE STYLES 🔽 */
+
+/* --- 1024px (Laptop & Large Tablet) --- */
+@media (max-width: 1024px) {
+  body {
+    padding: 10px;
+    max-width: 95%;
+  }
+  header {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 12px 15px;
+  }
+  header .title { font-size: 18px; }
+  header .btn-group a {
+    font-size: 13px;
+    padding: 6px 12px;
+  }
+  h1 { font-size: 1.4rem; }
+  .question { padding: 12px; }
+  .modal-content { max-width: 90%; }
+}
+
+/* --- 768px (Tablet) --- */
+@media (max-width: 768px) {
+  body { padding: 8px; }
+  header {
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+  }
+  header .btn-group { margin-top: 8px; }
+  h1 { font-size: 1.25rem; }
+  .question {
+    padding: 10px;
+    font-size: 0.95rem;
+  }
+  button.submit-btn {
+    width: 100%;
+    font-size: 0.95rem;
+  }
+  .modal-content {
+    max-width: 90%;
+    padding: 15px 20px;
+  }
+}
+
+/* --- 480px (Mobile) --- */
+@media (max-width: 480px) {
+  body {
+    padding: 6px;
+    max-width: 100%;
+  }
+  header {
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px;
+  }
+  header .title { font-size: 16px; }
+  header .btn-group a {
+    font-size: 12px;
+    padding: 5px 10px;
+  }
+  h1 { font-size: 1.1rem; margin-top: 15px; }
+  .question {
+    padding: 8px;
+    font-size: 0.85rem;
+  }
+  .question h3 { font-size: 1rem; }
+  button.submit-btn {
+    width: 100%;
+    font-size: 0.9rem;
+    padding: 10px;
+  }
+  .modal-content {
+    max-width: 95%;
+    padding: 12px 15px;
+  }
+  footer { font-size: 12px; padding: 15px; }
+  .timer { font-size: 14px; }
+}
+
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="title">Quiz-Basic Concepts of Database Structure</div>
+    <div class="btn-group">
+      <a href="Lesson2.html">📚 Back to Lesson</a>
+      <a href="index.html">🏠 Home</a>
+    </div>
+  </header>
+
+  <h1 class="Test">Quiz - Test Your Knowledge</h1>
+  <div class="timer">Time left: <span id="time">90</span>s</div>
+
+  <!-- (HTML remains same up to form) -->
+<form id="quizForm">
+  <div class="question">
+    <h3>1. What is the role of a "Table" in a database?</h3>
+    <label><input type="radio" name="q1" value="a"> It’s a design used for presentations</label>
+    <label><input type="radio" name="q1" value="b"> It stores related data like Grades or Attendance</label>
+    <label><input type="radio" name="q1" value="c"> It's used for eating lunch</label>
+  </div>
+
+  <div class="question">
+    <h3>2. In a database, what is a “Record” most similar to?</h3>
+    <label><input type="radio" name="q2" value="a"> A single row that stores details about one item or person</label>
+    <label><input type="radio" name="q2" value="b"> A heading of a table</label>
+    <label><input type="radio" name="q2" value="c"> A music disc</label>
+  </div>
+
+  <div class="question">
+    <h3>3. If each student has a name, grade, and ID, what are these pieces of info called?</h3>
+    <label><input type="radio" name="q3" value="a"> Fields</label>
+    <label><input type="radio" name="q3" value="b"> Tables</label>
+    <label><input type="radio" name="q3" value="c"> Charts</label>
+  </div>
+
+  <div class="question">
+    <h3>4. Why do we need a Primary Key in a table?</h3>
+    <label><input type="radio" name="q4" value="a"> To keep data in alphabetical order</label>
+    <label><input type="radio" name="q4" value="b"> To ensure each record is uniquely identified</label>
+    <label><input type="radio" name="q4" value="c"> To color the rows</label>
+  </div>
+
+  <div class="question">
+    <h3>5. How does a Foreign Key work?</h3>
+    <label><input type="radio" name="q5" value="a"> It links records in one table to another table</label>
+    <label><input type="radio" name="q5" value="b"> It translates languages</label>
+    <label><input type="radio" name="q5" value="c"> It opens a door</label>
+  </div>
+
+  <div class="question">
+    <h3>6. What’s an advantage of using structured data?</h3>
+    <label><input type="radio" name="q6" value="a"> It looks more colorful</label>
+    <label><input type="radio" name="q6" value="b"> It helps in organizing, analyzing, and retrieving data faster</label>
+    <label><input type="radio" name="q6" value="c"> It works only on weekends</label>
+  </div>
+
+  <div class="question">
+    <h3>7. In the story, why did the teacher struggle with grades and honors?</h3>
+    <label><input type="radio" name="q7" value="a"> She had too many pens</label>
+    <label><input type="radio" name="q7" value="b"> Her data was unorganized and not in a database</label>
+    <label><input type="radio" name="q7" value="c"> The students were not cooperating</label>
+  </div>
+
+  <div class="question">
+    <h3>8. Why is a database helpful during emergencies?</h3>
+    <label><input type="radio" name="q8" value="a"> It’s easy to decorate</label>
+    <label><input type="radio" name="q8" value="b"> Data can be quickly and securely accessed</label>
+    <label><input type="radio" name="q8" value="c"> It hides student names</label>
+  </div>
+
+  <div class="question">
+    <h3>9. What happens if two students have the same name but different IDs?</h3>
+    <label><input type="radio" name="q9" value="a"> The system gets confused</label>
+    <label><input type="radio" name="q9" value="b"> Their unique ID (Primary Key) still keeps them separate</label>
+    <label><input type="radio" name="q9" value="c"> They become one student</label>
+  </div>
+
+  <div class="question">
+    <h3>10. Which real-life situation is a good use of a database?</h3>
+    <label><input type="radio" name="q10" value="a"> Managing library records and student data</label>
+    <label><input type="radio" name="q10" value="b"> Drawing with crayons</label>
+    <label><input type="radio" name="q10" value="c"> Writing poems</label>
+  </div>
+
+  <button type="submit" class="submit-btn">Submit</button>
+</form>
+
+  <!-- Result Modal -->
+  <div id="resultModal">
+    <div class="modal-content">
+      <button class="close-btn">&times;</button>
+      <h2>Quiz Results & Rationalization</h2>
+      <p id="scoreText"></p>
+      <ul id="rationalizationList"></ul>
+      <button id="proceedBtn">🎮 Proceed to Game</button>
+    </div>
+  </div>
+
+  <footer>
+    ERDucate Developer © 2025 | Technological University of the Philippines
+  </footer>
+
+  <script>
+// ===== User Progress Setup =====
+let users = JSON.parse(localStorage.getItem("users")) || {};
+let currentUser = localStorage.getItem("loggedInUser") || "DemoUser";
+if (!users[currentUser]) users[currentUser] = { progress: {} };
+
+// ===== Quiz Answers & Rationalizations =====
+const answers = {
+  q1: "b",
+  q2: "a",
+  q3: "a",
+  q4: "b",
+  q5: "a",
+  q6: "b",
+  q7: "b",
+  q8: "b",
+  q9: "b",
+  q10: "a"
+};
+
+const rationalizations = {
+  q1: "Correct: Tables store related data, such as Grades or Attendance, in a structured format.",
+  q2: "Correct: A record is a row in a table that represents one item or person, like a student.",
+  q3: "Correct: Fields are individual pieces of information in a record, like Name or Grade.",
+  q4: "Correct: A Primary Key uniquely identifies each record to avoid confusion and duplication.",
+  q5: "Correct: A Foreign Key connects a record in one table to another table, creating relationships.",
+  q6: "Correct: Structured data helps organize, analyze, and access information quickly and accurately.",
+  q7: "Correct: The teacher had trouble because her data was not structured or stored in a database.",
+  q8: "Correct: Databases allow secure and fast access to critical student information when needed.",
+  q9: "Correct: Even if names are the same, unique Student IDs (Primary Keys) avoid confusion.",
+  q10: "Correct: Libraries and schools use databases to manage records efficiently and reliably."
+};
+
+const form = document.getElementById("quizForm");
+const modal = document.getElementById("resultModal");
+const scoreText = document.getElementById("scoreText");
+const rationalizationList = document.getElementById("rationalizationList");
+const closeBtn = modal.querySelector(".close-btn");
+const proceedBtn = document.getElementById("proceedBtn");
+const timerEl = document.getElementById("time");
+
+// ===== Timer =====
+let timeLeft = 90;  // seconds
+timerEl.textContent = timeLeft;
+const timer = setInterval(()=> {
+  timeLeft--;
+  timerEl.textContent = timeLeft;
+  if (timeLeft <= 0) {
+    clearInterval(timer);
+    form.requestSubmit();
+  }
+}, 1000);
+
+// ===== Quiz Submit Handler =====
+form.addEventListener("submit", function(e) {
+  e.preventDefault();
+  clearInterval(timer);
+  let score = 0;
+  rationalizationList.innerHTML = "";
+
+  for (let i = 1; i <= 10; i++) {
+    let qName = "q" + i;
+    let selected = (form[qName] && form[qName].value) || "";  
+    const li = document.createElement("li");
+    if (selected === answers[qName]) {
+      score++;
+      li.textContent = `✅ ${rationalizations[qName]}`;
+    } else {
+      li.textContent = `❌ ${rationalizations[qName]}`;
+    }
+    rationalizationList.appendChild(li);
+  }
+
+  scoreText.textContent = `You scored ${score} out of 10.`;
+
+  // ===== Update Progress & Unlock Proceed =====
+  if (score >= 7) {
+    users[currentUser].progress.quiz2 = true;   // ✅ quiz2 instead of quiz1
+    localStorage.setItem("users", JSON.stringify(users));
+    proceedBtn.classList.add("enabled");
+    proceedBtn.textContent = "Proceed to Game 2";
+  } else {
+    proceedBtn.classList.remove("enabled");
+    proceedBtn.textContent = "Score too low. Try again!";
+  }
+
+  modal.style.display = "flex";
+});
+
+// ===== Close Modal =====
+closeBtn.addEventListener("click", () => { modal.style.display = "none"; });
+
+// ===== Proceed Button =====
+proceedBtn.addEventListener("click", () => {
+  if (users[currentUser].progress.quiz2) {
+    location.href = "game2.html";   // ✅ proceed to game2
+  }
+});
+</script>

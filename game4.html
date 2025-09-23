@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ERDucate Lesson 3 - Multi Game</title>
+<link rel="icon" href="ERDucate.ico">
+<style>
+body {
+  font-family: 'Poppins', sans-serif;
+  background: url('Background-game-Lesson1.png') no-repeat center center fixed;
+  background-size: cover;
+  color: #333;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 20px;
+  transition: background-image 0.5s ease-in-out;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.6);
+  z-index: -1;
+}
+
+header {
+  background: #800000;
+  color: #fff;
+  padding: 12px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 8px;
+}
+
+header .title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+header .btn-group button,
+header .btn-group a {
+  border: 2px solid #fff;
+  background: transparent;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  margin-left: 8px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+header .btn-group button:hover,
+header .btn-group a:hover {
+  background: #fff;
+  color: #800000;
+}
+
+h1 {
+  text-align: center;
+  color: #800000;
+  margin: 18px 0;
+}
+
+.hidden {
+  display: none;
+}
+
+.cta-btn {
+  display: inline-block;
+  background: #800000;
+  color: #fff;
+  padding: 12px 22px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 16px;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  margin-top: 10px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.cta-btn:hover {
+  background: #a00000;
+  transform: scale(1.05);
+}
+
+#congratsMessage {
+  text-align: center;
+  font-size: 32px;
+  font-weight: bold;
+  color: #28a745;
+  margin: 30px 0;
+}
+
+#progressBtnContainer {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+table {
+  border-collapse: collapse;
+  margin: 0 auto;
+  background: #fff;
+}
+
+th,
+td {
+  border: 1px solid #800000;
+  padding: 6px 10px;
+  text-align: center;
+}
+
+.key-btn {
+  padding: 6px 10px;
+  border: 2px solid #800000;
+  background: #fff;
+  cursor: pointer;
+  margin: 4px;
+  border-radius: 6px;
+}
+
+.key-btn:hover {
+  background: #800000;
+  color: #fff;
+}
+
+.key-btn.selected {
+  background: #28a745;
+  color: #fff;
+}
+
+.modal-bg {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.modal-bg.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.modal {
+  background: white;
+  padding: 20px 28px;
+  border-radius: 10px;
+  max-width: 500px;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.modal h2 {
+  margin-bottom: 12px;
+  color: #800000;
+}
+
+/* ✅ Responsive adjustments */
+
+/* 🔶 For tablets / smaller desktops */
+@media (max-width: 1024px) {
+  body {
+    padding: 10px;
+  }
+  header {
+    flex-direction: column;
+    text-align: center;
+  }
+  header .btn-group {
+    margin-top: 10px;
+  }
+  th, td {
+    font-size: 15px;
+    padding: 8px;
+  }
+  table {
+    width: 100%;
+  }
+}
+
+/* 🔶 For tablets and large phones */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 20px;
+  }
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  header .title {
+    text-align: center;
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  .cta-btn {
+    font-size: 14px;
+    padding: 10px 16px;
+    width: 100%;
+    display: block;
+    text-align: center;
+  }
+  th, td {
+    font-size: 14px;
+    padding: 6px;
+  }
+  table {
+    font-size: 14px;
+    width: 100%;
+  }
+}
+
+/* 🔶 For small phones */
+@media (max-width: 480px) {
+  body {
+    padding: 8px;
+  }
+  h1 {
+    font-size: 18px;
+  }
+  header .title {
+    font-size: 16px;
+  }
+  header .btn-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  header .btn-group button,
+  header .btn-group a {
+    margin: 4px 4px;
+    font-size: 12px;
+    padding: 5px 10px;
+  }
+  th, td {
+    font-size: 12px;
+    padding: 4px;
+  }
+  .cta-btn {
+    width: 90%;
+    font-size: 13px;
+    padding: 8px 12px;
+    margin: 0 auto;
+  }
+  #congratsMessage {
+    font-size: 22px;
+  }
+  table {
+    font-size: 12px;
+  }
+}
+
+
+</style>
+</head>
+<body>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<audio id="successSound" src="ClappLesson1.mp3"></audio>
+<audio id="bgMusic" src="BackgroundLesson1.mp3" loop></audio>
+
+<header>
+  <div class="title">Lesson 4 — Multi-Game</div>
+  <div class="btn-group">
+    <button id="musicBtn" onclick="toggleMusic(this)">🔊 Mute</button>
+    <a href="quiz3.html">📋 Back to Quiz</a>
+    <a href="index.html">🏠 Home</a>
+  </div>
+</header>
+
+<h1 id="roundTitle">Round 1</h1>
+<p style="text-align:center;">❤️ Chances left: <span id="chanceDisplay">5</span></p>
+<div id="roundsWrapper"></div>
+
+<div id="progressBtnContainer" class="hidden">
+  <div id="congratsMessage" class="hidden">🎉 Congratulations! You completed Lesson 3! 🎉</div>
+  <a href="progress.html" class="cta-btn">📊 View Your Progress</a>
+</div>
+
+<div id="introUniqueKey" class="modal-bg">
+  <div class="modal">
+    <h2>Stage: Spot the Unique Column 🔑</h2>
+    <p>Identify the column that can serve as a Primary Key in the table. Click Start to begin!</p>
+    <button class="cta-btn" onclick="startUniqueGame()">Start Stage</button>
+  </div>
+</div>
+
+<div id="introBuildKey" class="modal-bg hidden">
+  <div class="modal">
+    <h2>Stage: Delivery Detective 🚚🔍</h2>
+    <p>Find the combination of columns that together form a unique key for each delivery record.</p>
+    <button class="cta-btn" onclick="startBuildGame()">Start Stage</button>
+  </div>
+</div>
+
+<script>
+let chances = 5;
+let roundIndex = 0;
+let selectedCols = [];
+
+// Rounds 1-5
+let roundsWho = [
+  { table:[[1,"Juan","BSIT"],[2,"Maria","BSIT"],[3,"Pedro","BSCS"],[4,"Ana","BSIT"]], columns:["ID","Name","Course"] },
+  { table:[["S001","Juan",20],["S002","Maria",20],["S003","Pedro",21],["S004","Ana",20]], columns:["StudentNo","Name","Age"] },
+  { table:[["T1","Math"],["T2","Math"],["T3","Science"],["T4","Math"]], columns:["TeacherID","Subject"] },
+  { table:[["B1","Database",100],["B2","Database",120],["B3","Java",100],["B4","Database",100]], columns:["BookID","Title","Price"] },
+  { table:[["C1","IT101","1st Yr"],["C2","IT101","1st Yr"],["C3","CS102","2nd Yr"],["C4","CS102","2nd Yr"]], columns:["ClassID","Code","Year"] }
+];
+
+// Fixed correct answers
+let whoAnswers = ["ID","StudentNo","TeacherID","BookID","ClassID"];
+
+// Shuffle helper
+function shuffleArray(array){
+  for(let i=array.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [array[i],array[j]]=[array[j],array[i]];
+  }
+  return array;
+}
+
+let roundsBuild = [
+  { title:"Round 6", table:[["John Doe","123 Main St","ParcelA"],["John Doe","123 Main St","ParcelB"],["Jane Roe","456 Oak St","ParcelA"],["Jane Roe","456 Oak St","ParcelB"]], columns:["Recipient","Address","ParcelID"], answer:["Recipient","ParcelID"] },
+  { title:"Round 7", table:[["Pedro","Monday"],["Pedro","Tuesday"],["Ana","Monday"],["Ana","Tuesday"]], columns:["Student","Day"], answer:["Student","Day"] },
+  { title:"Round 8", table:[["Cashier1","Milk"],["Cashier1","Bread"],["Cashier2","Milk"],["Cashier2","Bread"]], columns:["Cashier","Product"], answer:["Cashier","Product"] },
+  { title:"Round 9", table:[["Driver1","CarA"],["Driver1","CarB"],["Driver2","CarA"],["Driver2","CarB"]], columns:["Driver","Car"], answer:["Driver","Car"] }
+];
+
+function toggleMusic(btn){
+  const bgMusic = document.getElementById('bgMusic');
+  if(bgMusic.paused){ bgMusic.play(); btn.textContent="🔊 Mute"; }
+  else { bgMusic.pause(); btn.textContent="🔇 Unmute"; }
+}
+
+function renderScene(){
+  if(roundIndex < 5) renderWho(roundsWho[roundIndex], whoAnswers[roundIndex]);
+  else if(roundIndex < 9) renderBuild(roundsBuild[roundIndex-5]);
+  else showAnalysis();
+}
+
+function startUniqueGame(){
+  document.getElementById('introUniqueKey').classList.add('hidden');
+  renderScene();
+}
+
+function renderWho(r, answer){
+  document.getElementById('roundTitle').textContent = `Round ${roundIndex+1}`;
+  let html = `<table><tr>${r.columns.map(c=>`<th>${c}</th>`).join('')}</tr>`;
+  r.table.forEach(row=>{ html+=`<tr>${row.map(c=>`<td>${c}</td>`).join('')}</tr>` });
+  html+=`</table><p style='text-align:center;'>Which column can serve as a Primary Key?</p>`;
+
+  // Shuffle columns for buttons
+  let shuffledCols = shuffleArray([...r.columns]);
+  html+=`<div style='text-align:center;'>${shuffledCols.map(c=>`<button class='key-btn' onclick="checkWho('${c}','${answer}')">${c}</button>`).join('')}</div>`;
+
+  document.getElementById('roundsWrapper').innerHTML=html;
+}
+
+function checkWho(choice, answer){
+  if(choice===answer) nextRound();
+  else wrongAnswer();
+}
+
+function startBuildGame(){
+  document.getElementById('introBuildKey').classList.add('hidden');
+  roundIndex = 5;
+  renderScene();
+}
+
+function renderBuild(r){
+  selectedCols = [];
+  document.getElementById('roundTitle').textContent = r.title;
+  let html=`<table><tr>${r.columns.map(c=>`<th>${c}</th>`).join('')}</tr>`;
+  r.table.forEach(row=>{ html+=`<tr>${row.map(c=>`<td>${c}</td>`).join('')}</tr>` });
+  html+=`</table><p style='text-align:center;'>Select columns that together form a unique key:</p>`;
+  html+=`<div style='text-align:center;'>${r.columns.map(c=>`<button class='key-btn' onclick="toggleCol('${c}', this)">${c}</button>`).join('')}</div>`;
+  const encodedAnswer = encodeURIComponent(JSON.stringify(r.answer));
+  html+=`<div style='text-align:center; margin-top:10px;'><button class='cta-btn' onclick='checkBuild("${encodedAnswer}")'>Submit</button></div>`;
+  document.getElementById('roundsWrapper').innerHTML=html;
+}
+
+function toggleCol(col, btn){
+  if(selectedCols.includes(col)){ selectedCols = selectedCols.filter(x=>x!==col); btn.classList.remove('selected'); }
+  else { selectedCols.push(col); btn.classList.add('selected'); }
+}
+
+function checkBuild(encodedAnswer){
+  const answer = JSON.parse(decodeURIComponent(encodedAnswer));
+  if(JSON.stringify([...selectedCols].sort()) === JSON.stringify([...answer].sort())) nextRound();
+  else wrongAnswer();
+}
+
+function wrongAnswer(){
+  chances--;
+  document.getElementById('chanceDisplay').textContent=chances;
+  if(chances<=0){ alert("❌ Game Over!"); location.reload(); }
+  else alert("Wrong! Try again.");
+}
+
+function nextRound(){ roundIndex++; renderScene(); }
+
+function showAnalysis(){
+  document.getElementById('roundsWrapper').innerHTML=`<div class="short-answer">
+      <p>🧠 HOTS: Why is it important to identify correct primary and composite keys in database design?</p>
+      <textarea id="shortAnswer" style="width:90%;max-width:500px;height:90px;"></textarea><br>
+      <button class="cta-btn" onclick="submitAnswer()">Submit</button>
+    </div>`;
+}
+
+function submitAnswer(){
+  const ans=document.getElementById('shortAnswer').value.trim();
+  if(ans.length>5){ 
+    alert("✅ Correct! Keys ensure each record is unique and prevent data redundancy."); 
+    showCongrats(); 
+  } else alert("Please explain in at least 1 full sentence.");
+}
+
+function showCongrats(){
+  const successSound=document.getElementById('successSound');
+  if(successSound){ successSound.currentTime=0; successSound.volume=0.8; successSound.play(); }
+  confetti({ particleCount:150, spread:70, origin:{ y:0.6 } });
+  document.getElementById('congratsMessage').classList.remove('hidden');
+  document.getElementById('roundsWrapper').innerHTML="";
+  document.getElementById('progressBtnContainer').classList.remove('hidden');
+  const users=JSON.parse(localStorage.getItem("users"));
+  const currentUser=localStorage.getItem("loggedInUser");
+  if(users && currentUser){ users[currentUser].progress["game4"]=true; localStorage.setItem("users",JSON.stringify(users)); }
+}
+
+window.onload=()=>{ 
+  document.getElementById('chanceDisplay').textContent=chances;
+  document.getElementById('introUniqueKey').classList.remove('hidden'); 
+}
+</script>
+
+</body>
+</html>

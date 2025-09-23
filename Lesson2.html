@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ERDucate Web Based Module — Lesson 2</title>
+  <link rel="icon" href="ERDucate.ico">
+  <link rel="stylesheet" href="lesson2.css">
+</head>
+<style>
+ 
+    :root{
+  --maroon:#800000;
+  --bg:#f9f9f9;
+}
+body{
+  margin:0;
+  font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+  background: var(--bg); color:#222;
+}
+.page { max-width: 1000px; margin: 28px auto; padding: 0 16px; }
+h1{ text-align:center; color:var(--maroon); margin-bottom:14px; }
+
+/* Lesson container */
+.lesson-container {
+  position: relative;
+  width: 100%;
+  height: 520px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #eee;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.12);
+}
+.scene-bg {
+  position:absolute; inset:0;
+  background: url("Background-Lesson2.jpg") center/cover no-repeat;
+  filter: brightness(0.92) saturate(1.05) contrast(1.1);
+}
+.characters { position: absolute; inset:0; pointer-events:none; }
+.teacher {
+  position:absolute;
+  bottom: 20px;
+  left: 10%;
+  width: 160px;
+  z-index: 6;
+  pointer-events:auto;
+  animation: teacherSway 1.8s infinite ease-in-out;
+}
+.student {
+  position:absolute;
+  bottom: 20px;
+  width: 120px;
+  z-index: 5;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: transform 0.6s ease, opacity 0.35s ease;
+}
+.student1 { left: 50%; }
+.student2 { left: 70%; }
+
+@keyframes teacherSway {
+  0% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-6px) rotate(-3deg); }
+  100% { transform: translateY(0) rotate(3deg); }
+}
+
+/* Speech bubbles */
+.speech {
+  position: absolute;
+  max-width: 340px;
+  background: #fff;
+  padding: 12px 14px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+  font-size: 16px;
+  line-height: 1.35;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.36s ease, transform 0.36s ease;
+  z-index: 20;
+}
+.speech.show { opacity: 1; transform: translateY(0); }
+.speech.teacher { left: 8%; bottom: 20%; text-align: left; }
+.speech.student { right: 8%; bottom: 20%; text-align: left; }
+
+/* Teacher & student arrows */
+.speech::after{
+  content:""; position:absolute; width:0; height:0; border-style:solid;
+}
+.speech.teacher::after{
+  left:18px; bottom:-10px;
+  border-width:10px 10px 0 10px;
+  border-color:#fff transparent transparent transparent;
+}
+.speech.student::after{
+  right:18px; bottom:-10px;
+  border-width:10px 10px 0 10px;
+  border-color:#fff transparent transparent transparent;
+}
+
+/* Frankie bubble */
+#frankieBubble, #johnBubble {
+  display:none;
+  max-width: 280px;
+  padding:10px;
+  background:#fff;
+  border-radius:15px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.15);
+  position:absolute;
+  opacity:0;
+  transition:opacity 0.3s ease;
+  z-index:21;
+}
+#frankieBubble.show, #johnBubble.show { display:block; opacity:1; }
+#frankieBubble { top: 40%; left: 50%; transform: translate(-50%,0); }
+#johnBubble { top: 40%; right: 25%; transform: translate(0,0); }
+
+#frankieBubble::after{
+  left: 18px; bottom:-10px;
+  border-width:10px 10px 0 10px;
+  border-color:#fff transparent transparent transparent;
+}
+#johnBubble::after{
+  right: 18px; bottom:-10px;
+  border-width:10px 10px 0 10px;
+  border-color:#fff transparent transparent transparent;
+}
+
+/* Controls */
+.controls {
+  display:flex; justify-content:center; gap:14px; align-items:center; margin-top:14px;
+}
+.btn {
+  background: var(--maroon); color:#fff; padding:10px 18px; border-radius:8px; border:none;
+  cursor:pointer; font-weight:600; box-shadow: 0 6px 18px rgba(128,0,0,0.12);
+}
+.btn.secondary{ background:#fff; color:var(--maroon); border:2px solid var(--maroon); }
+.btn:active{ transform: translateY(1px); }
+
+/* Modal */
+.modal {
+  position: fixed; inset:0; display:flex; align-items:center; justify-content:center;
+  background: rgba(0,0,0,0.45); z-index: 9999;
+}
+.modal-card{
+  width: 92%; max-width:640px; background:#fff; border-radius:12px; padding:20px 22px;
+  box-shadow:0 14px 40px rgba(0,0,0,0.25); text-align:left;
+}
+.modal-card h2{ margin-top:0; color:var(--maroon); }
+.modal-card p{ margin:8px 0; line-height:1.45; }
+.modal-actions{ display:flex; justify-content:flex-end; gap:10px; margin-top:12px; }
+
+/* Floating DB info */
+#dbInfo {
+  display:none;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 340px;
+  background: #fff;
+  border: 2px solid var(--maroon);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  z-index: 9999;
+}
+#dbInfo h3{ margin-top:0; color:var(--maroon); font-size:18px; }
+#dbInfo p{ font-size:14px; line-height:1.4; margin:6px 0; }
+#dbInfo table{ width:100%; border-collapse:collapse; margin:10px 0; font-size:13px; }
+#dbInfo th, #dbInfo td{ border:1px solid #999; padding:6px; text-align:center; }
+
+/* Mini quiz */
+.mini-quiz{ margin-top:12px; }
+.mini-quiz button{ display:block; width:100%; margin:4px 0; padding:8px; border-radius:6px; border:1px solid var(--maroon); background:#fff; cursor:pointer; }
+.mini-quiz button.correct{ background:#d4edda; border-color:#28a745; }
+.mini-quiz button.wrong{ background:#f8d7da; border-color:#dc3545; }
+
+.quiz-link-btn{
+  display:block; margin-top:10px; text-align:center; padding:10px; background:var(--maroon);
+  color:#fff; border-radius:8px; text-decoration:none; font-weight:600;
+}
+
+/* ---------------------- */
+/* RESPONSIVE ADJUSTMENTS */
+/* ---------------------- */
+
+/* 1024px and below (large tablets & small laptops) */
+@media (max-width:1024px){
+  .lesson-container { height: 480px; }
+  .teacher { width: 140px; left: 8%; }
+  .student { width: 110px; }
+  .speech { max-width: 300px; font-size:15px; }
+  #dbInfo { width:300px; }
+}
+
+/* 768px and below (tablets) */
+@media (max-width:768px){
+  .lesson-container { height: 450px; }
+  .teacher { width:120px; left: 6%; }
+  .student { width:100px; }
+  .speech { max-width:260px; font-size:15px; bottom:18%; }
+  #dbInfo { width:280px; font-size:13px; }
+  h1 { font-size:22px; }
+}
+
+/* 480px and below (mobile) */
+@media (max-width:480px){
+  .lesson-container { height:420px; }
+  .teacher { width:100px; left: 4%; }
+  .student { width:85px; }
+  .speech { font-size:14px; bottom: 160px; max-width: 220px; }
+  #dbInfo { width:240px; font-size:12px; }
+  h1 { font-size: 20px; }
+  .btn { padding:8px 14px; font-size:14px; }
+}
+
+
+</style>
+<body>
+  <div class="page">
+    <h1>Lesson 2 — Basic Concepts of Database Structure</h1>
+
+    <!-- ✅ Lesson Objectives -->
+    <div class="modal-card" style="margin-bottom:18px;">
+      <h2>Lesson 2 Objectives</h2>
+      <p>At the end of the lesson, the student should be able to:</p>
+      <ul>
+        <li>Explain what a <strong> Database</strong> is and why it is important</li>
+        <li>Identify <Strong>Tables, Rows, and Columns</Strong></li>
+        <li>Understand the use of <Strong>Primary Key</Strong> and <Strong>Foreign Key</Strong></li>
+        <li>Relate to why data is divided into different tables</li>
+      </ul>
+    </div>
+
+    <!-- ✅ Story Scene -->
+    <div class="lesson-container">
+      <div class="scene-bg"></div>
+      <div class="characters">
+        <img src="TeacherLesson1.png" alt="Teacher" class="teacher" id="teacherImg">
+        <img src="studentfrankie.jpg" alt="Student" class="student student1" id="student1Img">
+        <img src="sTUDENT-jOHN.jpg" alt="Student" class="student student2" id="student2Img">
+      </div>
+      <div id="frankieBubble" class="bubble"></div>
+      <div id="johnBubble" class="bubble"></div>
+      <div class="speech teacher" id="teacherBubble"></div>
+      <div class="speech student" id="studentBubble"></div>
+    </div>
+
+    <!-- ✅ Controls -->
+    <div class="controls">
+      <button class="btn" id="startBtn">Start Class</button>
+      <button class="btn secondary" id="nextBtn" disabled>Next</button>
+      <button class="btn secondary" id="skipBtn">Skip to Quiz</button>
+    </div>
+  </div>
+
+  <!-- ✅ Intro Modal -->
+  <div class="modal" id="introModal">
+    <div class="modal-card">
+      <h2>Intro — Story Outline</h2>
+      <p>There is an ICT teacher named Ma’am Rivera. She is always busy checking papers, quizzes, and exams of her Grade 12 students. Because of the many records, she often gets confused about who has passed, who has missing requirements, and who is a consistent honor student.</p>
+      <p>One day, a student named Frankie asked why they don’t use a Database to make things easier. Ma’am Rivera thought it was a good idea!</p>
+      <p>In this short story, you will learn the Basic Concepts of Database Structure and how it helps organize information better.</p>
+      <div class="modal-actions">
+        <button class="btn secondary" id="closeModalBtn">Read Later</button>
+        <button class="btn" id="beginBtn">Start Story</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ Floating database info popup -->
+  <div id="dbInfo">
+    <h3>Summary — Basic Database Structure</h3>
+    <p><strong>Database:</strong> A collection of organized information.</p>
+    <p><strong>Table:</strong> Grid with rows (records) and columns (attributes).</p>
+    <p><strong>Keys:</strong> Primary Key uniquely identifies each row. Foreign Key links tables.</p>
+    <table>
+      <thead>
+        <tr><th>Student_ID</th><th>Name</th><th>Section</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>101</td><td>Juan</td><td>A</td></tr>
+        <tr><td>102</td><td>Maria</td><td>B</td></tr>
+      </tbody>
+    </table>
+    <div class="mini-quiz">
+      <p><strong>Check Yourself:</strong> What is the purpose of the Primary Key?</p>
+      <button onclick="checkAnswer(this,true)">To have a unique ID for each row</button>
+      <button onclick="checkAnswer(this,false)">To make the table colorful</button>
+      <button onclick="checkAnswer(this,false)">To increase the amount of data</button>
+    </div>
+    <a href="quiz2.html" class="quiz-link-btn">Take Quiz 2</a>
+  </div>
+
+ <script>
+// ---------------- Progress storage ----------------
+function loadProgress(){
+  return JSON.parse(localStorage.getItem("progress")) || {
+    topic:false, lesson1:false, lesson2:false,
+    quiz1:false, quiz2:false, games:false,
+    certificate:false
+  };
+}
+function saveProgress(obj){
+  localStorage.setItem("progress", JSON.stringify(obj));
+}
+let progress = loadProgress();
+
+// ---------------- DOM elements ----------------
+const introModal = document.getElementById('introModal');
+const beginBtn = document.getElementById('beginBtn');
+const closeModalBtn = document.getElementById('closeModalBtn');
+const startBtn = document.getElementById('startBtn');
+const nextBtn = document.getElementById('nextBtn');
+const skipBtn = document.getElementById('skipBtn');
+
+const teacherImg = document.getElementById('teacherImg');
+const student1Img = document.getElementById('student1Img');
+const student2Img = document.getElementById('student2Img');
+
+const teacherBubble = document.getElementById('teacherBubble');
+const studentBubble = document.getElementById('studentBubble');
+const frankieBubble = document.getElementById('frankieBubble');
+const johnBubble = document.getElementById('johnBubble');
+const dbInfo = document.getElementById('dbInfo');
+
+// ---------------- Dialogue sequence ----------------
+const sequence = [ { who:'teacher', text:"(sighs) So many quizzes and projects, I’m getting confused." }, { who:'student1', text:"Ma’am, why don’t we use a Database?" }, { who:'teacher', text:"Hmm… that’s a good idea, Frankie! And this is the perfect time to learn the Basic Concepts of Database Structure." }, { who:'teacher', text:"Think of a Database as a big cabinet of information." }, { who:'teacher', text:"Inside it, there are Tables—like folders with their own categories, such as Grades, Attendance, and Projects." }, { who:'teacher', text:"Each Record or Row is like a student in the class." }, { who:'teacher', text:"The Fields are the smaller details such as Name, Section, Math Grade, or English Grade." }, { who:'student2', text:"What if two students have the same name?" }, { who:'teacher', text:"Good question, John! That’s where the Primary Key comes in. For example, your Student ID number. Even if two students are both named Juan, their Student IDs are different, so they won’t be mixed up." }, { who:'student1', text:"Ahhh, so the Primary Key makes sure that every record is unique!" }, { who:'student1', text:"But Ma’am, what if I want to connect attendance with the student info?" }, { who:'teacher', text:"Excellent question, Frankie! That’s where the Foreign Key is used. For example, in the Attendance Table, we also put the Student ID. That Student ID is the Foreign Key that links back to the Student Table." }, { who:'student2', text:"So the Foreign Key shows which student that attendance belongs to." }, { who:'teacher', text:"Correct! That’s how databases stay organized and connected." }, { who:'student1', text:"Wow, so with a Database, we can quickly see who is absent, who is failing, or who has perfect attendance." }, { who:'teacher', text:"Exactly! And remember, databases aren’t just used in schools. They’re also used in hospitals, banks, businesses, and even in government." }, { who:'student2', text:"So that’s why learning databases is important—not just for class, but for real life too!" }, { who:'teacher', text:"Absolutely! If you know how to manage data, you’ll be more prepared for the challenges of the modern world." }, { who:'students', text:"Thank you, Ma’am Rivera! Now we better understand how important databases are." }, { who:'teacher', text:"I’m happy to see your interest. Let’s keep learning and apply this not only in theory but also in real situations." } ];
+
+let idx = -1;
+
+// ---------------- Functions ----------------
+function hideBubbles(){
+  teacherBubble.classList.remove('show');
+  studentBubble.classList.remove('show');
+  frankieBubble.classList.remove('show');
+  johnBubble.classList.remove('show');
+}
+
+function showItem(i){
+  if(i < 0 || i >= sequence.length) return;
+  const item = sequence[i];
+  hideBubbles();
+
+  setTimeout(()=>{
+    if(item.who==='teacher'){
+      teacherBubble.textContent = item.text;
+      teacherBubble.classList.add('show');
+    } else if(item.who==='student1'){
+      frankieBubble.textContent = "Frankie: " + item.text;
+      frankieBubble.classList.add('show');
+      student1Img.style.opacity='1';
+      student1Img.style.transform='translateY(0)';
+    } else if(item.who==='student2'){
+      johnBubble.textContent = "John: " + item.text;
+      johnBubble.classList.add('show');
+      student2Img.style.opacity='1';
+      student2Img.style.transform='translateY(0)';
+    } else if(item.who==='students'){
+      studentBubble.textContent = item.text;
+      studentBubble.classList.add('show');
+      [student1Img, student2Img].forEach(img=>{
+        img.style.opacity='1';
+        img.style.transform='translateY(0)';
+      });
+    }
+    nextBtn.disabled = false;
+  },180);
+}
+
+function next(){
+  nextBtn.disabled = true;
+  idx++;
+  if(idx < sequence.length){
+    showItem(idx);
+  } else {
+    dbInfo.style.display = 'block';
+    progress.lesson2 = true;   // ✅ mark lesson as done
+    saveProgress(progress);
+    // proceed to quiz page
+    setTimeout(()=> window.location.href='quiz2.html', 1500);
+  }
+}
+
+function startScene(){
+  idx = -1;
+  introModal.style.display='none';
+  teacherImg.style.opacity='1';
+  [student1Img, student2Img].forEach(img=>{
+    img.style.opacity='0';
+    img.style.transform='translateY(20px)';
+  });
+  teacherBubble.textContent='';
+  studentBubble.textContent='';
+  frankieBubble.textContent='';
+  johnBubble.textContent='';
+  hideBubbles();
+  nextBtn.disabled=true;
+  setTimeout(()=>{ next(); },300);
+}
+
+// ---------------- Event listeners ----------------
+beginBtn.addEventListener('click', startScene);
+startBtn.addEventListener('click', startScene);
+nextBtn.addEventListener('click', next);
+closeModalBtn.addEventListener('click', ()=> introModal.style.display='none');
+
+// Skip → mark lesson2 done, then go quiz2
+skipBtn.addEventListener('click', ()=>{
+  progress.lesson2 = true;
+  saveProgress(progress);
+  window.location.href='quiz2.html';
+});
+
+// ---------------- On page load ----------------
+window.addEventListener("load",()=>{
+  progress = loadProgress();
+  if(progress.lesson2){
+    console.log("Lesson 2 already completed ✅ but still replayable.");
+  }
+});
+</script>

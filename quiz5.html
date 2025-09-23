@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ERDucate Lesson5 - Table Relationships</title>
+<link rel="icon" href="ERDucate.ico">
+<style>
+  body {
+    font-family: 'Poppins', sans-serif;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 20px;
+    background-image: url("Quiz-Background-Lesson2.png");
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-attachment: fixed;
+    background-size: cover;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    position: relative;
+}
+header {
+    background-color: #800000;
+    color: #fff;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+header .title {
+    font-size: 20px;
+    font-weight: 600;
+    flex: 1 1 100%;
+    margin-bottom: 10px;
+    text-align: center;
+}
+header .btn-group a {
+    background: transparent;
+    border: 2px solid #fff;
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 14px;
+    transition: 0.3s ease;
+    margin: 4px 4px 0 0;
+    display: inline-block;
+}
+header .btn-group a:hover {
+    background: #fff;
+    color: #800000;
+}
+h1 {
+    color: #800000;
+    text-align: center;
+    margin-top: 25px;
+    font-size: 22px;
+}
+form {
+    margin-top: 20px;
+    width: 100%;
+}
+.question {
+    background: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+.question h3 {
+    margin: 0 0 10px;
+    color: #800000;
+    font-size: 16px;
+}
+.question label {
+    display: block;
+    margin: 6px 0;
+    font-size: 14px;
+    cursor: pointer;
+}
+button.submit-btn {
+    padding: 12px 20px;
+    background: #800000;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.3s ease;
+    display: block;
+    margin: 15px auto 15px auto;
+    width: 100%;
+    font-size: 16px;
+}
+button.submit-btn:hover {
+    background: #a00000;
+}
+footer {
+    text-align: center;
+    background: #800000;
+    color: #fff;
+    padding: 25px;
+    font-size: 13px;
+}
+.timer {
+    font-weight: bold;
+    font-size: 16px;
+    text-align: center;
+    margin-top: 10px;
+}
+#resultModal {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 9999;
+}
+.modal-content {
+    background: #fff;
+    border-radius: 12px;
+    max-width: 600px;
+    width: 100%;
+    padding: 20px 25px;
+    text-align: left;
+    position: relative;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    overflow-y: auto;
+    max-height: 90vh;
+}
+.modal-content h2 {
+    color: #800000;
+    margin-top: 0;
+    font-size: 20px;
+}
+.modal-content ul {
+    padding-left: 20px;
+    margin: 15px 0;
+    font-size: 14px;
+}
+.modal-content button {
+    margin-top: 15px;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    background: #800000;
+    color: #fff;
+    cursor: pointer;
+    position: relative;
+    width: 100%;
+    font-size: 16px;
+}
+.modal-content button:hover {
+    background: #a00000;
+}
+.close-btn {
+    position: absolute;
+    top: 10px; right: 15px;
+    background: transparent;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    color: #666;
+}
+.close-btn:hover {
+    color: #000;
+}
+#proceedBtn {
+    opacity: 0.5;
+    pointer-events: none;
+}
+#proceedBtn.enabled {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* ===== Responsive Breakpoints ===== */
+
+/* Large tablets / small laptops */
+@media (max-width: 1024px) {
+    body { max-width: 95%; }
+    header { padding: 12px 15px; }
+    header .title { font-size: 19px; }
+    h1 { font-size: 21px; }
+    .question h3 { font-size: 15px; }
+}
+
+/* Tablets */
+@media (max-width: 768px) {
+    h1 { font-size: 20px; }
+    .question h3 { font-size: 15px; }
+    .question label { font-size: 13px; }
+    button.submit-btn { font-size: 15px; padding: 10px; }
+    .modal-content h2 { font-size: 18px; }
+    .modal-content ul { font-size: 13px; }
+    header { flex-direction: column; align-items: flex-start; padding: 10px; }
+    header .btn-group { display: flex; flex-wrap: wrap; gap: 8px; }
+    .modal-content { max-width: 90%; }
+}
+
+/* Phones */
+@media (max-width: 480px) {
+    body { padding: 0 10px; }
+    h1 { font-size: 18px; margin-top: 15px; }
+    .question { padding: 12px; }
+    .question h3 { font-size: 14px; }
+    .question label { font-size: 12px; }
+    button.submit-btn { font-size: 14px; padding: 10px; }
+    .timer { font-size: 14px; }
+    .modal-content { padding: 15px 18px; }
+    .modal-content h2 { font-size: 16px; }
+    .modal-content button { font-size: 15px; }
+    footer { padding: 15px; font-size: 12px; }
+}
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="title">Quiz 5 - Table Relationships</div>
+  <div class="btn-group">
+    <a href="Lesson5.html">📚 Back to Lesson</a>
+    <a href="index.html">🏠 Home</a>
+  </div>
+</header>
+
+<h1 class="Test">Quiz - Situational: Relationship Types</h1>
+<div class="timer">Time left: <span id="time">150</span>s</div>
+
+<form id="quizForm"></form>
+
+<!-- Submit button above footer -->
+<button id="submitQuiz" class="submit-btn">Submit</button>
+
+<script>
+const form = document.getElementById("quizForm");
+const submitBtn = document.getElementById("submitQuiz");
+
+const questions = [
+  "A student has exactly one school ID card.",
+  "One teacher supervises many students.",
+  "Students can enroll in many clubs, and each club can have many students.",
+  "A library book is borrowed by only one student at a time.",
+  "One student can submit many assignments.",
+  "Each employee has one unique employee ID.",
+  "Students can enroll in multiple subjects, and each subject has multiple students.",
+  "A student is assigned to one locker only.",
+  "One author writes multiple books.",
+  "Multiple students can share multiple computers in a lab.",
+  "A car has only one license plate.",
+  "One manager oversees several employees.",
+  "Patients can have multiple doctors, and doctors have multiple patients.",
+  "Each passport belongs to only one citizen.",
+  "One teacher can teach many courses."
+];
+
+const answers = {
+  q1:"a", q2:"b", q3:"c", q4:"a", q5:"b",
+  q6:"a", q7:"c", q8:"a", q9:"b", q10:"c",
+  q11:"a", q12:"b", q13:"c", q14:"a", q15:"b"
+};
+
+const rationalizations = {
+  q1:"✅ One-to-One: Each student has exactly one ID card.",
+  q2:"✅ One-to-Many: One teacher supervises multiple students.",
+  q3:"✅ Many-to-Many: Students can join multiple clubs, each club has many students.",
+  q4:"✅ One-to-One: A library book is borrowed by one student at a time.",
+  q5:"✅ One-to-Many: One student can submit many assignments.",
+  q6:"✅ One-to-One: Each employee has a unique employee ID.",
+  q7:"✅ Many-to-Many: Students enroll in multiple subjects; each subject has many students.",
+  q8:"✅ One-to-One: Each student assigned one locker only.",
+  q9:"✅ One-to-Many: One author writes multiple books.",
+  q10:"✅ Many-to-Many: Multiple students share multiple lab computers.",
+  q11:"✅ One-to-One: Each car has one license plate.",
+  q12:"✅ One-to-Many: One manager oversees several employees.",
+  q13:"✅ Many-to-Many: Patients can have multiple doctors and vice versa.",
+  q14:"✅ One-to-One: Each passport belongs to one citizen.",
+  q15:"✅ One-to-Many: One teacher can teach many courses."
+};
+
+// Generate questions
+questions.forEach((text,i)=>{
+  const div = document.createElement("div");
+  div.className="question";
+  const qNum=i+1;
+  div.innerHTML=`<h3>${qNum}. ${text}</h3>
+    <label><input type="radio" name="q${qNum}" value="a"> One-to-One</label>
+    <label><input type="radio" name="q${qNum}" value="b"> One-to-Many</label>
+    <label><input type="radio" name="q${qNum}" value="c"> Many-to-Many</label>`;
+  form.appendChild(div);
+});
+
+// Modal
+const modal = document.createElement("div");
+modal.id="resultModal";
+modal.innerHTML=`<div class="modal-content">
+  <button class="close-btn">&times;</button>
+  <h2>Quiz Results & Rationalization</h2>
+  <p id="scoreText"></p>
+  <ul id="rationalizationList"></ul>
+  <button id="proceedBtn">Proceed to Game 5</button>
+</div>`;
+document.body.appendChild(modal);
+
+const timerEl = document.getElementById("time");
+let timeLeft=150;
+timerEl.textContent=timeLeft;
+const timer = setInterval(()=>{
+  timeLeft--; timerEl.textContent=timeLeft;
+  if(timeLeft<=0){ clearInterval(timer); submitBtn.click(); }
+},1000);
+
+const closeBtn = modal.querySelector(".close-btn");
+const scoreText = modal.querySelector("#scoreText");
+const rationalizationList = modal.querySelector("#rationalizationList");
+const proceedBtn = modal.querySelector("#proceedBtn");
+
+let users = JSON.parse(localStorage.getItem("users"))||{};
+let currentUser = localStorage.getItem("loggedInUser")||"DemoUser";
+if(!users[currentUser]) users[currentUser]={progress:{}};
+
+proceedBtn.addEventListener("mouseenter", ()=>{
+  if(!users[currentUser].progress.quiz5) {
+    const x=Math.random()*150; const y=Math.random()*50;
+    proceedBtn.style.transform=`translate(${x}px, ${y}px)`;
+  }
+});
+proceedBtn.addEventListener("mouseleave", ()=>{ proceedBtn.style.transform=`translate(0,0)` });
+
+submitBtn.addEventListener("click", ()=>{
+  clearInterval(timer);
+  let score=0;
+  rationalizationList.innerHTML="";
+  for(let i=1;i<=15;i++){
+    let selected=(form["q"+i]&&form["q"+i].value)||"";
+    const li=document.createElement("li");
+    if(selected===answers["q"+i]){
+      score++; li.textContent=rationalizations["q"+i];
+    } else {
+      li.textContent="❌ Incorrect. "+rationalizations["q"+i].slice(2);
+    }
+    rationalizationList.appendChild(li);
+  }
+  scoreText.textContent=`You scored ${score} out of 15.`;
+  if(score>=11){
+    users[currentUser].progress.quiz5=true;
+    localStorage.setItem("users",JSON.stringify(users));
+    proceedBtn.classList.add("enabled");
+    proceedBtn.textContent="🎮 Proceed to Game ";
+  } else {
+    proceedBtn.classList.remove("enabled");
+    proceedBtn.textContent="Score too low. Try again!";
+  }
+  modal.style.display="flex";
+});
+
+closeBtn.addEventListener("click",()=>{ modal.style.display="none"; });
+proceedBtn.addEventListener("click",()=>{ if(users[currentUser].progress.quiz5) location.href="game5.html"; });
+</script>
+
+<footer>
+  ERDucate Developer © 2025 | Technological University of the Philippines
+</footer>
+
+</body>
+</html>
